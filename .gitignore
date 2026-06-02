@@ -1,0 +1,28 @@
+# API keys and secrets — NEVER commit
+secrets.local.js
+*.local.js
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Build outputs
+dist/
+build/
+node_modules/
+
+# Overwolf packaging output
+*.opk
+releases/

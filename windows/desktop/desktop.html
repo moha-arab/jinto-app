@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jinto — settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: #0B0B0F;
+      color: #F4F1EA;
+      font-family: 'IBM Plex Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .app {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 36px 32px;
+    }
+    .brand {
+      font-family: 'Anton', sans-serif;
+      font-size: 40px;
+      letter-spacing: 0.02em;
+      margin-bottom: 4px;
+    }
+    .brand-accent { color: #C6FF3D; }
+    .subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #5A5A66;
+      margin-bottom: 32px;
+    }
+
+    .section {
+      background: #15151C;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #C6FF3D;
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0;
+    }
+    .row label {
+      flex: 0 0 90px;
+      font-size: 13px;
+      color: #B4B4BA;
+    }
+    .row .value {
+      flex: 1 1 auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #F4F1EA;
+    }
+
+    /* Volume slider */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .slider {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      background: #26262E;
+      border-radius: 2px;
+      outline: none;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #C6FF3D;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .slider-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #F4F1EA;
+      min-width: 44px;
+      text-align: right;
+    }
+
+    /* Select */
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0B0B0F;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #F4F1EA;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+    }
+    select:focus { border-color: #C6FF3D; }
+
+    /* Buttons */
+    button {
+      padding: 9px 16px;
+      background: #C6FF3D;
+      color: #0B0B0F;
+      border: none;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: opacity 120ms ease;
+    }
+    button:hover { opacity: 0.86; }
+    button.secondary {
+      background: transparent;
+      color: #F4F1EA;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .footer {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #5A5A66;
+      letter-spacing: 0.1em;
+      text-align: center;
+      margin-top: 28px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="brand">JINTO<span class="brand-accent">.GG</span></div>
+    <div class="subtitle">// SETTINGS</div>
+
+    <div class="section">
+      <div class="section-title">// VOICE</div>
+
+      <div class="slider-row" style="margin-bottom: 14px;">
+        <label style="flex: 0 0 70px; font-size: 12px; color: #B4B4BA;">Volume</label>
+        <input id="volume-slider" class="slider" type="range" min="0" max="100" value="100" />
+        <span id="volume-value" class="slider-value">100%</span>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <div style="font-size: 12px; color: #B4B4BA; margin-bottom: 6px;">Voice</div>
+        <select id="voice-select"></select>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button id="test-voice-btn">▶ test voice</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">// STATUS</div>
+      <div class="row"><label>Hotkey</label><span class="value">backtick ` (push to talk)</span></div>
+      <div class="row"><label>STT</label><span class="value">Deepgram Nova-3</span></div>
+      <div class="row"><label>LLM</label><span class="value">Claude Haiku 4.5</span></div>
+      <div class="row"><label>TTS</label><span id="tts-status" class="value">Cartesia Sonic-3</span></div>
+      <div class="row"><label>Conversation</label><span id="conv-status" class="value">0 turns</span></div>
+      <div class="row"><label>Agent</label><span id="agent-status" class="value">unknown</span></div>
+      <div class="row"><label>Map</label><span id="map-status" class="value">unknown</span></div>
+      <div class="row"><label>GEP</label><span id="gep-status" class="value">checking...</span></div>
+      <div class="row"><label>Last GEP</label><span id="gep-raw" class="value" style="font-size: 10px; opacity: 0.7;">none yet</span></div>
+      <div class="row"><label>Features</label><span id="gep-features" class="value" style="font-size: 10px; opacity: 0.7;">unknown</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">// DEBUG</div>
+      <button id="force-snapshot-btn" class="secondary">PULL FRESH GAME STATE</button>
+      <p style="font-size: 11px; color: #5A5A66; margin-top: 8px;">Click after you're in a custom game to force-pull current agent/map from Valorant.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">// CONVERSATION</div>
+      <p style="font-size: 13px; color: #B4B4BA; margin-bottom: 12px;">jinto remembers up to 20 messages in this session. Reset to start fresh.</p>
+      <button id="reset-btn" class="secondary">RESET CONVERSATION</button>
+    </div>
+
+    <div class="footer">BUILD 2026-05-27-PHASE3 · PRESS CTRL+J TO TOGGLE · CLOSE WITH × ABOVE</div>
+  </div>
+
+  <script src="desktop.js"></script>
+</body>
+</html>

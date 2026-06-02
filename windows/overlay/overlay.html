@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jinto — overlay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="overlay.css">
+</head>
+<body>
+  <div id="jinto-card" class="card hidden" role="status" aria-live="polite">
+    <!-- thin accent rail -->
+    <span class="rail"></span>
+
+    <div class="inner">
+      <header class="hdr">
+        <span class="dot brand-dot"></span>
+        <span class="wm">jinto</span>
+        <span id="status-text" class="status"></span>
+      </header>
+
+      <!-- you said (tiny, for STT feedback) -->
+      <div id="transcript-row" class="ask hidden">
+        <span id="transcript"></span>
+      </div>
+
+      <!-- diagram (hero when present) -->
+      <div id="image-slot" class="shot hidden">
+        <img id="image-el" alt="" />
+      </div>
+
+      <!-- jinto's answer -->
+      <div id="response-row" class="say hidden">
+        <span id="response"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../scripts/services/event-bus.js"></script>
+  <script src="overlay.js"></script>
+</body>
+</html>
