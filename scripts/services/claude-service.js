@@ -5,8 +5,10 @@
 class ClaudeService {
   constructor(apiKey) {
     this.apiKey = apiKey;
-    this.model = 'claude-haiku-4-5';
-    this.maxTokens = 512;
+    // Sonnet 4.6 — smart enough to actually coach (follow brevity, reason, not ramble).
+    // Haiku was too weak (rambled, assumed, ignored instructions). Opus 4.8 is available if we want max quality at higher latency.
+    this.model = 'claude-sonnet-4-6';
+    this.maxTokens = 400;
     this._abortController = null;
   }
 
