@@ -45,20 +45,19 @@ The 40m leash — wandering off and killing your own setup — is the big one. O
 `,
 
   // Diagrams jinto can show. It calls show_image with the id when its answer is about that thing.
-  // Each maps to ONE specific spot/lineup. Show only when the player asks about THAT thing.
-  // (Removed the push-paths "overview" map — it's not a placement diagram and confused the answer.)
+  // Each is ONE clean placement shot (single panel, marker shows the exact spot).
+  // Verified by eye. Removed the double-panel / action-shot images that confused the setup.
+  // NOTE: the alarmbot has no clean single placement image, so describe it verbally ("alarmbot in Lane") — don't show a diagram for it.
   images: [
-    { id: 'killjoy-ascent-b-turret-logs', when: 'asked specifically where the B turret goes (the Logs cubby spot)' },
-    { id: 'killjoy-ascent-b-turret-defspawn', when: 'asked about the alternate B turret spot on the Defender-Spawn barrels watching B Main' },
-    { id: 'killjoy-ascent-b-alarmbot-lane', when: 'asked specifically where the alarmbot goes in Lane' },
-    { id: 'killjoy-ascent-b-toaster-coverage', when: 'asked specifically where the two nanoswarms go in Lane / the area they cover' },
-    { id: 'killjoy-ascent-mid-market-setup', when: 'asked about the mid / Market alarmbot + molly setup' },
-    { id: 'killjoy-ascent-a-retake-lockdown', when: 'asked where to put Lockdown to retake A' },
-    { id: 'killjoy-ascent-b-retake-lockdown', when: 'asked where to put Lockdown to retake B' },
-    { id: 'killjoy-ascent-lineup-b-default', when: 'asked for the B default-plant post-plant nanoswarm lineup' },
-    { id: 'killjoy-ascent-lineup-a-generator', when: 'asked for the A Generator post-plant nanoswarm lineup' },
-    { id: 'killjoy-ascent-lineup-a-greenboxes', when: 'asked for the A Green Boxes post-plant nanoswarm lineup' },
-    { id: 'killjoy-ascent-a-tree-nano1', when: 'asked about the A Tree Room nanoswarm setup (when forced to anchor A)' },
-    { id: 'killjoy-ascent-attack-mid-turret', when: 'asked about the attack-side flank-watch turret spot' },
+    { id: 'killjoy-ascent-b-turret-logs', when: 'where the B turret goes (deep in the Logs cubby)' },
+    { id: 'killjoy-ascent-b-turret-defspawn', when: 'the alternate B turret spot — on the Defender-Spawn barrels watching B Main' },
+    { id: 'killjoy-ascent-b-toaster-nano1', when: 'where to place the FIRST nanoswarm in Lane (B Toaster setup)' },
+    { id: 'killjoy-ascent-b-toaster-nano2', when: 'where to place the SECOND nanoswarm in Lane (B Toaster setup)' },
+    { id: 'killjoy-ascent-mid-market-setup', when: 'the mid / Market setup' },
+    { id: 'killjoy-ascent-a-retake-lockdown', when: 'where to put Lockdown to retake A' },
+    { id: 'killjoy-ascent-b-retake-lockdown', when: 'where to put Lockdown to retake B' },
+    { id: 'killjoy-ascent-lineup-b-default', when: 'the B default-plant post-plant nanoswarm lineup' },
+    { id: 'killjoy-ascent-a-tree-nano1', when: 'the A Tree Room nanoswarm setup (when forced to anchor A)' },
+    { id: 'killjoy-ascent-attack-mid-turret', when: 'the attack-side flank-watch turret spot' },
   ],
 };
