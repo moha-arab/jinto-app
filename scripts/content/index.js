@@ -4,7 +4,7 @@
 const JINTO_CONTENT = (function() {
   const modules = [
     VIPER_BREEZE,
-    // KILLJOY_LOTUS, JETT_ASCENT, BREACH_FRACTURE — deferred until Viper/Breeze is done
+    KILLJOY_ASCENT,
   ];
   const map = {};
   for (const m of modules) {

@@ -241,12 +241,9 @@ class BackgroundController {
     const knowState = !!(gs.agent && gs.map);
     const reason = knowState ? refusalReason(gs.agent, gs.map) : null;
     if (reason && knowState) {
-      let refusal;
-      if (reason === 'agent') {
-        refusal = "Right now I only coach Viper on Breeze. More coming soon.";
-      } else if (reason === 'map') {
-        refusal = `I coach Viper, but only on Breeze right now. Hop on Breeze and ask me anything.`;
-      }
+      const refusal = (typeof buildRefusalLine === 'function')
+        ? buildRefusalLine(reason, gs.agent)
+        : "Right now I coach Viper on Breeze and Killjoy on Ascent. More coming soon.";
       console.log('[jinto/bg] code-gate refusal:', reason, gs.agent, gs.map);
       this.eventBus.trigger('state', { key: 'speaking', label: 'refusing' });
       this.eventBus.trigger('response', refusal);
