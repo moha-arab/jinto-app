@@ -1,4 +1,4 @@
-/* ===== jinto overlay — small text card (top-right) + big diagram panel (right-center) ===== */
+/* ===== jinto overlay — everything stacks down the TOP-RIGHT (left stays clear for minimap) ===== */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -14,30 +14,33 @@ html, body {
   pointer-events: none;
 }
 
-/* ============ TEXT CARD (top-right) ============ */
-
-#jinto-card {
+/* The right-side stack: text card on top, diagrams below, flowing down. */
+#jinto-stack {
   position: fixed;
-  top: 22px;
-  right: 22px;
+  top: 16px;
+  right: 16px;
   width: 320px;
   display: flex;
-  background: rgba(9, 9, 12, 0.78);
+  flex-direction: column;
+  gap: 10px;
+  max-height: calc(100vh - 32px);
+  pointer-events: none;
+}
+
+/* ============ TEXT CARD ============ */
+
+#jinto-card {
+  width: 100%;
+  display: flex;
+  background: rgba(9, 9, 12, 0.80);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 12px;
   overflow: hidden;
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
-  opacity: 1;
-  transform: translateX(0);
-  transition: opacity 280ms ease, transform 280ms ease;
 }
-#jinto-card.hidden {
-  opacity: 0;
-  transform: translateX(10px);
-  pointer-events: none;
-}
+#jinto-card.hidden { display: none; }
 
 .rail {
   flex: 0 0 3px;
@@ -58,19 +61,15 @@ html, body {
 .say { font-size: 13.5px; line-height: 1.5; color: #F4F1EA; }
 .say.hidden { display: none; }
 
-/* ============ DIAGRAM COLUMN (top-left, stacks down) ============ */
+/* ============ DIAGRAM COLUMN (under the card, stacks down) ============ */
 
 #jinto-diagrams {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  width: 300px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: calc(100vh - 32px);
   overflow: hidden;
-  pointer-events: none;
+  flex: 0 1 auto;
 }
 
 .diagram-card {
@@ -82,16 +81,9 @@ html, body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   animation: diagramIn 220ms ease;
 }
-
 @keyframes diagramIn {
-  from { opacity: 0; transform: translateX(-12px); }
+  from { opacity: 0; transform: translateX(12px); }
   to   { opacity: 1; transform: none; }
-}
-
-.diagram-card.leaving {
-  opacity: 0;
-  transform: translateX(-12px);
-  transition: opacity 240ms ease, transform 240ms ease;
 }
 
 .diagram-card img {
