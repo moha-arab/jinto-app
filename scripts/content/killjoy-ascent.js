@@ -1,130 +1,63 @@
-// killjoy-ascent.js — Killjoy on Ascent lessons.
-// Built from 2 deep-research passes + the Dignitas guide (visually verified). Images in img/overlay/.
-// Coaching style: practical implications, not stat trivia. The diagram carries the precision; jinto gives the concept + why.
+// killjoy-ascent.js — Killjoy on Ascent.
+// KNOWLEDGE-SHAPED (not canned Q&A): a coach's mental model that jinto reasons over to answer anything.
+// Built from 2 fact-checked research passes + the Dignitas guide (visually verified). Images in img/overlay/.
 
 const KILLJOY_ASCENT = {
   agent: 'Killjoy',
   map: 'Ascent',
-  lessons: [
-    {
-      id: 'kj-ascent-kit',
-      triggers: ['kit', 'abilities', 'how does killjoy work', 'rundown', 'never played killjoy', 'what do my abilities do', 'first time'],
-      short: "Quick version. Turret is free intel and a slow — hide it, it dies fast. Alarmbot detects and makes them take double damage, and it's your signal to pop mollies. Nanoswarms are your two hidden mollies — save them for traps and post-plant. And the big one: your turret and alarmbot shut off if you wander more than forty meters away, so anchor, don't roam.",
-      expanded: "Lockdown, your ult, detains everyone on a site — it's your retake button. The whole agent is about layering: the alarmbot tells you when, the mollies punish, the turret slows and reveals. You're strongest when all of it covers one choke.",
-      image: null,
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-how-to-play',
-      triggers: ['how do i play killjoy on ascent', 'which site', 'where should i play', 'how to play this map', 'where do i go', 'anchor'],
-      short: "On Ascent you anchor B and retake A. B's Lane is a tight choke your traps lock down — a Killjoy-Sova B hold is brutal to push. Set up B, hold it, and when they commit A, you rotate and retake with your ult.",
-      expanded: "She can hold A too, but B is her home on this map because the Lane choke leaves attackers nowhere to escape your mollies. Default to B unless your team needs you on A.",
-      image: 'killjoy-ascent-b-toaster-overview',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-b-toaster',
-      triggers: ['b setup', 'how do i set up b', 'b site setup', 'toaster oven', 'best b setup', 'defend b', 'b defense'],
-      short: "The classic B setup is the Toaster Oven. Most pushes come through Lane because it's fastest, and it's so narrow there's nowhere to dodge your mollies. Two Nanoswarms covering Lane plus an alarmbot to trigger them — here's the layout.",
-      expanded: "When the alarmbot pings, pop the first Nanoswarm, then the second — the two cover the whole choke and the gaps between them are too small to slip through, so anyone pushing eats damage the whole way.",
-      image: 'killjoy-ascent-b-toaster-coverage',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-b-turret',
-      triggers: ['turret on b', 'where do i put my turret', 'b turret', 'turret placement b', 'where turret b'],
-      short: "Two good B turret spots. Deep in the Logs cubby it ignores B Main but shreds anyone pushing Lane — that's the one that pairs with the Toaster. Or on the Defender Spawn barrels watching B Main. Either way, hide it; it dies to a few bullets.",
-      expanded: "The Logs turret is the famous one because it catches the Lane push without giving itself away to B Main. Save the Def Spawn barrels spot for when you expect a B Main hit instead.",
-      image: 'killjoy-ascent-b-turret-logs',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-alarmbot-combo',
-      triggers: ['alarmbot', 'how to use alarmbot', 'alarm bot', 'nanoswarm combo', 'when to molly', 'when do i pop mollies', 'trigger'],
-      short: "Your alarmbot is the trigger — the instant it goes off, pop your Nanoswarms. Place it closer to the entrance for more reaction time, or deeper so they walk further into the trap before it pings. Here's the Lane placement.",
-      expanded: "Don't waste the alarmbot as a standalone — its real job is timing your mollies. And it applies Vulnerable, so anything caught in the molly afterward takes double damage.",
-      image: 'killjoy-ascent-b-alarmbot-lane',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-mid-market',
-      triggers: ['mid', 'market', 'mid setup', 'cover mid', 'mid control'],
-      short: "Drop an alarmbot and a molly covering Market in mid — it delays anyone trying to take mid and buys your team time to rotate. Once a teammate rotates, hold a crossfire with them. Here's the spot.",
-      expanded: "Mid matters on Ascent because it opens both sites. You don't need to win mid alone — you just need to slow it down long enough that a rotate arrives.",
-      image: 'killjoy-ascent-mid-market-setup',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-lockdown',
-      triggers: ['ult', 'lockdown', 'when to ult', 'how to use ult', 'ultimate', 'when do i ult'],
-      short: "Lockdown detains everyone on the site — it's your retake button and a way to force enemies off a site. The one rule that matters: aim DOWN when you place it, or it lands on a table or box and gets shot before it detains.",
-      expanded: "Save it for retakes or a committed site take, not random rounds — it's destructible during the windup, so placement and cover are everything.",
-      image: 'killjoy-ascent-a-retake-lockdown-coverage',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-a-retake',
-      triggers: ['retake a', 'how do i retake a', 'a retake', 'take a back', 'lost a'],
-      short: "Since you anchor B, you'll often be retaking A. Drop your Lockdown in the corner — it covers the whole site and forces them back toward A Main or Wine. Aim down so it doesn't land on a box. Here's the spot.",
-      expanded: "Pair it with a Nanoswarm on the spike if you have one — the detain plus the molly makes a clean defuse almost impossible while your team swings in.",
-      image: 'killjoy-ascent-a-retake-lockdown',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-b-retake',
-      triggers: ['retake b', 'how do i retake b', 'b retake'],
-      short: "For a B retake, your Lockdown covers the whole site and forces them out toward you. Same rule — aim down when placing it so it can't be wallbanged during the windup. Here's the placement.",
-      expanded: "",
-      image: 'killjoy-ascent-b-retake-lockdown',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-lineup-b-default',
-      triggers: ['b lineup', 'b post plant', 'b default lineup', 'protect b spike', 'molly b plant', 'post plant b', 'b nanoswarm lineup'],
-      short: "For the default B plant at the Green Boxes, this Nanoswarm lineup lands right on the spike and covers the defuse — it runs the timer down on anyone trying. Here's where to stand and aim.",
-      expanded: "",
-      image: 'killjoy-ascent-lineup-b-default',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-lineup-a-generator',
-      triggers: ['a generator lineup', 'generator post plant', 'post plant a', 'molly generator', 'a lineup generator'],
-      short: "If the spike's at the Generator on A, this Nanoswarm lineup lands right on it to deny the defuse. Here's the stand spot and aim.",
-      expanded: "",
-      image: 'killjoy-ascent-lineup-a-generator',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-lineup-a-greenboxes',
-      triggers: ['a green boxes lineup', 'a default lineup', 'green box post plant a', 'a lineup green'],
-      short: "Spike at the Green Boxes on A — this Nanoswarm lineup covers it post-plant. Here's the spot and aim.",
-      expanded: "",
-      image: 'killjoy-ascent-lineup-a-greenboxes',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-a-setup',
-      triggers: ['a setup', 'defend a', 'how do i set up a', 'a site setup', 'anchor a', 'a defense'],
-      short: "You usually anchor B on Ascent, but if you're holding A: the Tree Room and the A door are tight spots made for your Nanoswarm traps, with your turret watching A Main or an off-angle. Here's a setup — just know B is her stronger side here.",
-      expanded: "If your team's comp puts you on A, treat Tree and the door like B's Lane — trap the choke, alarmbot to trigger, turret to slow and reveal. But if you have the choice, you're more valuable anchoring B.",
-      image: 'killjoy-ascent-a-tree-nano1',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-attack',
-      triggers: ['attack', 'how do i play attack', 'attacking as killjoy', 'attack setup', 'offense'],
-      short: "On attack you're support. Turret watching flank — in A Main or B Main — so no one sneaks behind. Alarmbot plus molly to clear a held angle before you push. And post-plant Nanoswarm lineups to lock the defuse once the spike's down. Here's a turret spot.",
-      expanded: "Your Lockdown can also force defenders off a site for the take. You're not the entry — you're the one who makes the site stick after your team takes it.",
-      image: 'killjoy-ascent-attack-mid-turret',
-      attribution: 'self-recorded',
-    },
-    {
-      id: 'kj-ascent-mistakes',
-      triggers: ['common mistakes', 'what am i doing wrong', 'mistakes', 'how to improve killjoy', 'what not to do'],
-      short: "The biggest one: wandering more than forty meters from your turret and alarmbot, which silently shuts them off and wastes your whole setup. Anchor and stay central. Second: don't blow both Nanoswarms on one trigger — stagger them so the trap lasts longer.",
-      expanded: "Other traps to avoid: putting your turret somewhere obvious where it dies round one, and ulting on a random round instead of saving Lockdown for the retake where it wins you the site.",
-      image: null,
-      attribution: 'self-recorded',
-    },
+
+  knowledge: `
+ROLE / IDENTITY
+Killjoy is a lockdown sentinel — she wins rounds by denying space with gadgets, not by fragging. On Ascent her home is B. The map funnels attackers through a few tight chokes, and B's Lane is the tightest: a long narrow corridor where her trap layering leaves nowhere to dodge. A Killjoy + Sova B hold is one of the hardest things in the game to push. Default plan: anchor B, lock it down, and use your ult to retake A when they commit there. She can hold A, but B is where she's strongest — play B unless your team genuinely needs you elsewhere.
+
+THE 40-METER LEASH (her biggest constraint)
+Her turret and alarmbot shut OFF if she strays more than ~40m from them, and take a beat to re-arm when she returns. This is the #1 thing newer Killjoys get wrong — they set up B, then wander mid or go lurk for a pick, and silently disable their own setup. Anchor. Stay central. Your value is the gadgets being live, not your aim.
+
+THE B LANE TRAP — "TOASTER OVEN"
+Her signature B setup. Most B pushes come through Lane because it's the fastest way on, and it's so narrow that two nanoswarms laid along it cover the whole width — the gaps between them are too thin to slip through, so anyone pushing takes damage the entire way. An alarmbot in Lane is the trigger: the moment it pings, you pop the mollies. A common variation puts the second molly on the ledge at the end of Lane — covers slightly less but is much harder for enemies to clear before they push.
+
+ALARMBOT AS A TRIGGER (the core skill)
+Don't treat the alarmbot as a standalone — it's the timer for your mollies. When it goes off, you molly. Its placement depth is a real choice: closer to the entrance buys you more reaction time; deeper lets enemies commit further into the trap before it fires. It also applies Vulnerable (double damage), so whatever the molly then hits gets shredded. The alarmbot-into-nanoswarm combo is most of her defensive value.
+
+TURRET CRAFT
+Two main B turret spots. Deep in the Logs cubby it can't see B Main but it shreds anyone pushing Lane — this is the one that pairs with the Toaster, and it's the famous KJ Ascent turret because it stays hidden from B Main while still covering the push. Alternatively, on the Defender Spawn barrels watching B Main, for when you expect a B Main hit. Either way the turret is fragile — a few bullets kill it — and its job is intel and a slow, not kills, so hide it on an angle they won't instantly clear. Don't plant it somewhere obvious where it dies round one.
+
+MID / MARKET
+You don't hold mid, you delay it. An alarmbot + molly covering Market buys time and warns you if they try to take mid to split a site. Once a teammate rotates to mid, hold a crossfire with them instead of peeking alone.
+
+THE ULT — LOCKDOWN
+Lockdown detains everyone on a site for a few seconds — a retake button and a force-them-off-site tool, not something to burn on a random round. The one rule that wins or wastes it: aim DOWN when you place it. Looking up drops it on a box or table where enemies can shoot it during its wind-up and destroy it before it detains. Place it low, behind cover.
+
+RETAKES
+Because you anchor B, you'll usually be retaking A. Drop Lockdown in the A corner — it covers the site and forces attackers back toward A Main or Wine while your team swings in. Pair it with a nanoswarm on the spike if you have one; detain plus molly makes a clean defuse nearly impossible. There's an equivalent B-retake Lockdown spot that blankets the site and pushes them out toward you.
+
+POST-PLANT LINEUPS
+Your nanoswarms double as anti-defuse area denial — they run the timer down on anyone trying to defuse. There are set lineups for the common plants: the default B plant at the Green Boxes, the A Generator plant, and the A Green Boxes plant. Each has a stand spot and an aim point — the diagram shows it exactly, so lean on that rather than describing pixels.
+
+A SITE WHEN YOU'RE FORCED THERE
+If your comp puts you on A instead of B, treat A's Tree Room and the A door like Lane — tight spots perfect for nanoswarm traps, turret watching A Main or an off-angle. Just know A is her weaker side here; given the choice, you're worth more on B.
+
+ATTACK
+On attack she's support, not entry. Turret to watch flank (A Main or B Main) so nobody sneaks behind the team. Alarmbot + molly to dislodge a defender holding a key angle before the push. After the plant, the nanoswarm lineups lock the defuse. Lockdown can also clear a site for the take.
+
+COMMON MISTAKES
+The 40m leash — wandering off and killing your own setup — is the big one. Others: obvious turret spots that die instantly; blowing both nanoswarms on a single trigger instead of staggering them so the trap lasts longer; and either hoarding Lockdown until you never use it, or wasting it on a round where it doesn't actually win you the site.
+`,
+
+  // Diagrams jinto can show. It calls show_image with the id when its answer is about that thing.
+  images: [
+    { id: 'killjoy-ascent-b-toaster-overview', when: 'explaining how she holds B / the overall Toaster Oven plan' },
+    { id: 'killjoy-ascent-b-toaster-coverage', when: 'the two-nanoswarm Lane trap and the area it covers' },
+    { id: 'killjoy-ascent-b-alarmbot-lane', when: 'where to place the alarmbot in Lane' },
+    { id: 'killjoy-ascent-b-turret-logs', when: 'the Logs-cubby turret spot' },
+    { id: 'killjoy-ascent-b-turret-defspawn', when: 'the Defender-Spawn-barrels turret watching B Main' },
+    { id: 'killjoy-ascent-mid-market-setup', when: 'the mid / Market alarmbot + molly setup' },
+    { id: 'killjoy-ascent-a-retake-lockdown', when: 'the A-retake Lockdown placement' },
+    { id: 'killjoy-ascent-b-retake-lockdown', when: 'the B-retake Lockdown placement' },
+    { id: 'killjoy-ascent-lineup-b-default', when: 'the B default-plant (Green Boxes) post-plant nanoswarm lineup' },
+    { id: 'killjoy-ascent-lineup-a-generator', when: 'the A Generator post-plant nanoswarm lineup' },
+    { id: 'killjoy-ascent-lineup-a-greenboxes', when: 'the A Green Boxes post-plant nanoswarm lineup' },
+    { id: 'killjoy-ascent-a-tree-nano1', when: 'the A Tree Room nanoswarm setup (when forced to anchor A)' },
+    { id: 'killjoy-ascent-attack-mid-turret', when: 'the attack-side flank-watch turret spot' },
   ],
 };

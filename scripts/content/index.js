@@ -25,37 +25,56 @@ function getContentForCombo(agent, map) {
 }
 
 /**
- * Set of valid image IDs across all loaded lessons (for validating show_image tool calls).
+ * Set of valid image IDs across all loaded combos (validates show_image tool calls).
+ * Supports both schemas: knowledge-shaped ({images:[{id}]}) and lesson-shaped ({lessons:[{image}]}).
  */
 function getKnownImageIds() {
   const ids = new Set();
   for (const key in JINTO_CONTENT) {
     const m = JINTO_CONTENT[key];
-    for (const l of (m.lessons || [])) {
-      if (l.image) ids.add(l.image);
-    }
+    for (const im of (m.images || [])) if (im && im.id) ids.add(im.id);
+    for (const l of (m.lessons || [])) if (l && l.image) ids.add(l.image);
   }
   return ids;
 }
 
 /**
- * Render lessons as a compact prompt block for Claude.
+ * Render a combo's knowledge as a prompt block for Claude.
+ * Knowledge-shaped modules (preferred) → rich knowledge + a diagram list to reason over.
+ * Lesson-shaped modules (legacy, e.g. Viper/Breeze) → the lesson list.
  */
 function renderLessonsForPrompt(module) {
-  if (!module || !module.lessons || module.lessons.length === 0) {
-    return '# LESSONS\n(No lessons loaded yet — you have no specific Viper Breeze knowledge. If asked anything specific, honestly say you are still being trained on this combo and do not invent answers.)';
+  if (!module) {
+    return '(No knowledge loaded for this combo. If asked anything specific, honestly say you do not have it yet — do not invent.)';
   }
-  const lines = [];
-  lines.push('# LESSONS — your COMPLETE knowledge of ' + module.agent + ' on ' + module.map);
-  lines.push('This is everything you know. If a question is not covered here, say you do not have it yet. Do not invent.');
-  lines.push('');
-  for (const l of module.lessons) {
-    lines.push('## ' + l.id);
-    lines.push('Fires when player asks about: ' + (l.triggers || []).join(', '));
-    lines.push('ANSWER: ' + l.short);
-    if (l.expanded) lines.push('IF THEY WANT MORE: ' + l.expanded);
-    if (l.image) lines.push('IMAGE: this lesson has a diagram. When you give this answer, call show_image with image_id "' + l.image + '".');
+
+  // Knowledge-shaped (the good format)
+  if (module.knowledge) {
+    let s = '# YOUR KNOWLEDGE — ' + module.agent + ' on ' + module.map + '\n';
+    s += 'This is the full extent of what you know about this combo. Reason over ALL of it to answer the player in your own words. If something genuinely is not covered, say you do not have it yet — never invent.\n';
+    s += module.knowledge.trim() + '\n';
+    if (module.images && module.images.length) {
+      s += '\n# DIAGRAMS YOU CAN SHOW\nWhen your answer is about one of these, call show_image with its id (silently — do not say the id out loud):\n';
+      for (const im of module.images) s += '- ' + im.id + ' — ' + (im.when || '') + '\n';
+    }
+    return s;
+  }
+
+  // Legacy lesson-shaped
+  if (module.lessons && module.lessons.length) {
+    const lines = [];
+    lines.push('# YOUR KNOWLEDGE — ' + module.agent + ' on ' + module.map);
+    lines.push('Reason over all of this to answer in your own words. If a question is not covered, say you do not have it yet. Do not invent.');
     lines.push('');
+    for (const l of module.lessons) {
+      lines.push('## ' + l.id);
+      lines.push(l.short);
+      if (l.expanded) lines.push('More: ' + l.expanded);
+      if (l.image) lines.push('(Diagram available — call show_image with image_id "' + l.image + '".)');
+      lines.push('');
+    }
+    return lines.join('\n');
   }
-  return lines.join('\n');
+
+  return '(No knowledge loaded for this combo yet — say so honestly, do not invent.)';
 }
