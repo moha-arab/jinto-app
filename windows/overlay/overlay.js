@@ -1,18 +1,21 @@
-// overlay.js — small text card (top-right) + a column of diagrams (top-left, stacks down).
-// Multiple diagrams can show at once; they clear when you ask the next question (or after a timeout).
+// overlay.js — text card (top-right) + a one-at-a-time gallery you cycle with the next-key.
+// show_image opens a 1-step gallery; show_setup opens a multi-step gallery; next-diagram advances.
 
 (function() {
   const els = {
     card: null, statusText: null,
     transcriptRow: null, transcript: null,
     responseRow: null, response: null,
-    diagrams: null, brandDot: null,
+    gallery: null, img: null, label: null, count: null, hint: null,
+    brandDot: null,
   };
 
   let cardHideTimer = null;
-  let diagramsHideTimer = null;
-  const shownIds = new Set(); // dedupe within a single answer
-  const DIAGRAMS_MS = 30000;  // how long diagrams linger after the last one
+  let galleryHideTimer = null;
+  const GALLERY_MS = 45000; // lingers a while; player usually clears it with the next question
+
+  let steps = [];   // [{label, src|null}]
+  let idx = 0;
 
   function init() {
     els.card          = document.getElementById('jinto-card');
@@ -21,11 +24,15 @@
     els.transcript    = document.getElementById('transcript');
     els.responseRow   = document.getElementById('response-row');
     els.response      = document.getElementById('response');
-    els.diagrams      = document.getElementById('jinto-diagrams');
+    els.gallery       = document.getElementById('jinto-gallery');
+    els.img           = document.getElementById('gallery-img');
+    els.label         = document.getElementById('gallery-label');
+    els.count         = document.getElementById('gallery-count');
+    els.hint          = document.getElementById('gallery-hint');
     els.brandDot      = document.querySelector('.brand-dot');
 
     hideCard();
-    clearDiagrams();
+    clearGallery();
     setState('idle', '');
 
     resizeToGame();
@@ -34,7 +41,7 @@
       const main = overwolf.windows.getMainWindow();
       const bus = main && main.jintoEventBus;
       if (bus) bus.addListener(handleEvent);
-      else console.warn('[jinto/overlay] no event bus on main window');
+      else console.warn('[jinto/overlay] no event bus');
     } catch (err) {
       console.error('[jinto/overlay] bus wiring failed', err);
     }
@@ -58,13 +65,12 @@
   function handleEvent(name, payload) {
     if (name === 'ptt') {
       if (payload === 'down') {
-        // New question — reset card, wipe the diagram column from the last answer.
         clearCardHide();
         setState('listening', '');
         els.transcript.textContent = '';
         els.transcriptRow.classList.add('hidden');
         els.responseRow.classList.add('hidden');
-        clearDiagrams();
+        clearGallery();          // new question wipes the old gallery
         showCard();
         els.brandDot.classList.add('pulse');
       } else if (payload === 'up') {
@@ -90,44 +96,78 @@
     }
 
     if (name === 'show_image') {
-      if (payload && payload.src) addDiagram(payload.src, payload.alt || '', payload.caption || '');
+      if (payload && payload.src) {
+        openGallery([{ label: payload.caption || captionFromId(payload.alt || ''), src: payload.src }]);
+      }
     }
 
-    if (name === 'hide_image') clearDiagrams();
-    if (name === 'hide_overlay') { hideCard(); clearDiagrams(); }
+    if (name === 'show_setup') {
+      if (payload && payload.steps && payload.steps.length) {
+        openGallery(payload.steps);
+      }
+    }
+
+    if (name === 'next-diagram') {
+      advanceGallery();
+    }
+
+    if (name === 'hide_image' || name === 'hide_overlay') {
+      clearGallery();
+      if (name === 'hide_overlay') hideCard();
+    }
   }
 
-  // ---- diagram column ----
+  // ---- gallery ----
 
-  function addDiagram(src, id, caption) {
-    if (!els.diagrams) return;
-    if (id && shownIds.has(id)) return; // already showing this one this turn
-    if (id) shownIds.add(id);
-
-    const card = document.createElement('div');
-    card.className = 'diagram-card';
-
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = id || '';
-    card.appendChild(img);
-
-    const cap = document.createElement('div');
-    cap.className = 'cap';
-    cap.textContent = caption || captionFromId(id);
-    card.appendChild(cap);
-
-    els.diagrams.appendChild(card);
-
-    // restart the linger timer each time a new diagram arrives
-    if (diagramsHideTimer) clearTimeout(diagramsHideTimer);
-    diagramsHideTimer = setTimeout(clearDiagrams, DIAGRAMS_MS);
+  function openGallery(newSteps) {
+    steps = newSteps || [];
+    idx = 0;
+    renderStep();
+    if (els.gallery) els.gallery.classList.remove('hidden');
+    if (galleryHideTimer) clearTimeout(galleryHideTimer);
+    galleryHideTimer = setTimeout(clearGallery, GALLERY_MS);
   }
 
-  function clearDiagrams() {
-    if (els.diagrams) els.diagrams.innerHTML = '';
-    shownIds.clear();
-    if (diagramsHideTimer) { clearTimeout(diagramsHideTimer); diagramsHideTimer = null; }
+  function advanceGallery() {
+    if (!steps.length) return;
+    idx = (idx + 1) % steps.length;
+    renderStep();
+    if (galleryHideTimer) clearTimeout(galleryHideTimer);
+    galleryHideTimer = setTimeout(clearGallery, GALLERY_MS);
+  }
+
+  function renderStep() {
+    const step = steps[idx];
+    if (!step) return;
+
+    if (step.src) {
+      els.img.src = step.src;
+      els.img.classList.remove('hidden');
+    } else {
+      els.img.removeAttribute('src');
+      els.img.classList.add('hidden');
+    }
+
+    els.label.textContent = step.label || '';
+
+    if (steps.length > 1) {
+      els.count.textContent = (idx + 1) + ' / ' + steps.length;
+      els.hint.classList.remove('hidden');
+    } else {
+      els.count.textContent = '';
+      els.hint.classList.add('hidden');
+    }
+  }
+
+  function clearGallery() {
+    steps = [];
+    idx = 0;
+    if (els.gallery) els.gallery.classList.add('hidden');
+    if (els.img) { els.img.removeAttribute('src'); els.img.classList.add('hidden'); }
+    if (els.label) els.label.textContent = '';
+    if (els.count) els.count.textContent = '';
+    if (els.hint) els.hint.classList.add('hidden');
+    if (galleryHideTimer) { clearTimeout(galleryHideTimer); galleryHideTimer = null; }
   }
 
   function captionFromId(id) {

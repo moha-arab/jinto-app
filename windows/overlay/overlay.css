@@ -61,48 +61,67 @@ html, body {
 .say { font-size: 13.5px; line-height: 1.5; color: #F4F1EA; }
 .say.hidden { display: none; }
 
-/* ============ DIAGRAM COLUMN (under the card, stacks down) ============ */
+/* ============ GALLERY (one step at a time, cycle with next-key) ============ */
 
-#jinto-diagrams {
+#jinto-gallery {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  overflow: hidden;
-  flex: 0 1 auto;
-}
-
-.diagram-card {
   background: rgba(8, 8, 11, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.10);
   border-left: 3px solid #C6FF3D;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  animation: diagramIn 220ms ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
 }
-@keyframes diagramIn {
-  from { opacity: 0; transform: translateX(12px); }
-  to   { opacity: 1; transform: none; }
-}
+#jinto-gallery.hidden { display: none; }
 
-.diagram-card img {
+.gallery-img {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 210px;
+  max-height: 320px;
   object-fit: contain;
   background: #0b0b0f;
 }
+.gallery-img.hidden { display: none; }
 
-.diagram-card .cap {
-  padding: 5px 10px 6px;
+.gallery-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 9px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.30);
+}
+.gallery-label {
+  flex: 1 1 auto;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: #F4F1EA;
+}
+.gallery-count {
+  flex: 0 0 auto;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   color: #C6FF3D;
 }
-.diagram-card .cap:empty { display: none; }
+
+.gallery-hint {
+  padding: 6px 12px 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 234, 0.4);
+  text-align: right;
+}
+.gallery-hint.hidden { display: none; }
+.gallery-hint kbd {
+  padding: 1px 5px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+  color: #F4F1EA;
+  margin: 0 1px;
+}

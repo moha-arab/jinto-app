@@ -5,12 +5,13 @@
   <title>jinto — overlay</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="overlay.css">
 </head>
 <body>
-  <!-- Everything stacks down the top-right: text card on top, diagrams below. -->
+  <!-- Everything stacks down the top-right. Left stays clear for the minimap. -->
   <div id="jinto-stack">
+    <!-- text card: what jinto says -->
     <div id="jinto-card" class="card hidden" role="status" aria-live="polite">
       <span class="rail"></span>
       <div class="inner">
@@ -19,17 +20,20 @@
           <span class="wm">jinto</span>
           <span id="status-text" class="status"></span>
         </header>
-        <div id="transcript-row" class="ask hidden">
-          <span id="transcript"></span>
-        </div>
-        <div id="response-row" class="say hidden">
-          <span id="response"></span>
-        </div>
+        <div id="transcript-row" class="ask hidden"><span id="transcript"></span></div>
+        <div id="response-row" class="say hidden"><span id="response"></span></div>
       </div>
     </div>
 
-    <!-- Diagram column: one or more diagrams, stacks down under the card. Populated at runtime. -->
-    <div id="jinto-diagrams" class="diagrams"></div>
+    <!-- gallery: ONE step at a time; cycle with the next-key -->
+    <div id="jinto-gallery" class="gallery hidden">
+      <img id="gallery-img" class="gallery-img" alt="" />
+      <div class="gallery-bar">
+        <span id="gallery-label" class="gallery-label"></span>
+        <span id="gallery-count" class="gallery-count"></span>
+      </div>
+      <div id="gallery-hint" class="gallery-hint hidden">press <kbd>N</kbd> for next</div>
+    </div>
   </div>
 
   <script src="../../scripts/services/event-bus.js"></script>

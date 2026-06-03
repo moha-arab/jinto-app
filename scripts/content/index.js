@@ -38,6 +38,22 @@ function getKnownImageIds() {
   return ids;
 }
 
+/** Look up a setup by id within an agent+map combo. Null if not found. */
+function getSetupById(agent, map, setupId) {
+  const mod = getContentForCombo(agent, map);
+  if (!mod || !mod.setups) return null;
+  return mod.setups.find((s) => s.id === setupId) || null;
+}
+
+/** Valid setup ids across all combos (validates show_setup tool calls). */
+function getKnownSetupIds() {
+  const ids = new Set();
+  for (const key in JINTO_CONTENT) {
+    for (const s of (JINTO_CONTENT[key].setups || [])) if (s && s.id) ids.add(s.id);
+  }
+  return ids;
+}
+
 /**
  * Render a combo's knowledge as a prompt block for Claude.
  * Knowledge-shaped modules (preferred) → rich knowledge + a diagram list to reason over.
@@ -53,8 +69,12 @@ function renderLessonsForPrompt(module) {
     let s = '# YOUR KNOWLEDGE — ' + module.agent + ' on ' + module.map + '\n';
     s += 'This is the full extent of what you know about this combo. Reason over ALL of it to answer the player in your own words. If something genuinely is not covered, say you do not have it yet — never invent.\n';
     s += module.knowledge.trim() + '\n';
+    if (module.setups && module.setups.length) {
+      s += '\n# FULL SETUPS\nWhen the player asks how to SET UP / ANCHOR / DEFEND a site (a multi-piece setup), call show_setup with the id below INSTEAD of show_image. It opens a step-by-step gallery the player cycles through, so every placement is covered. Give a one-line spoken summary and let the gallery show the spots.\n';
+      for (const st of module.setups) s += '- ' + st.id + ' — ' + (st.name || '') + '\n';
+    }
     if (module.images && module.images.length) {
-      s += '\n# DIAGRAMS YOU CAN SHOW\nWhen your answer is about one of these, call show_image with its id (silently — do not say the id out loud):\n';
+      s += '\n# DIAGRAMS (single spots)\nFor a question about ONE specific spot or lineup, call show_image with its id (silently). For a whole setup, use show_setup instead.\n';
       for (const im of module.images) s += '- ' + im.id + ' — ' + (im.when || '') + '\n';
     }
     return s;

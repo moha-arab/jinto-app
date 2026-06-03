@@ -26,6 +26,11 @@
         "title": "Show/hide jinto settings",
         "action-type": "toggle",
         "default": "Ctrl+J"
+      },
+      "jinto_next": {
+        "title": "jinto — next diagram",
+        "action-type": "custom",
+        "default": "N"
       }
     },
     "externally_connectable": {

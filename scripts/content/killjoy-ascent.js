@@ -60,4 +60,19 @@ The 40m leash — wandering off and killing your own setup — is the big one. O
     { id: 'killjoy-ascent-a-tree-nano1', when: 'the A Tree Room nanoswarm setup (when forced to anchor A)' },
     { id: 'killjoy-ascent-attack-mid-turret', when: 'the attack-side flank-watch turret spot' },
   ],
+
+  // Full step-by-step setups. jinto calls show_setup(id); the player cycles through the steps with the "next" key.
+  // A step with image:null shows as a labeled card (so nothing — like the alarmbot — ever gets skipped).
+  setups: [
+    {
+      id: 'b-defense',
+      name: 'B defense setup',
+      steps: [
+        { label: 'Turret — deep in the Logs cubby (covers Lane, hidden from B Main)', image: 'killjoy-ascent-b-turret-logs' },
+        { label: 'Alarmbot — in Lane; this is your trigger to pop the mollies', image: null },
+        { label: 'Nanoswarm 1 — first spot in Lane', image: 'killjoy-ascent-b-toaster-nano1' },
+        { label: 'Nanoswarm 2 — on the cracked brick further down Lane', image: 'killjoy-ascent-b-toaster-nano2' },
+      ],
+    },
+  ],
 };

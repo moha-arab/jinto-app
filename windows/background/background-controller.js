@@ -2,21 +2,30 @@
 // PTT → capture mic → Deepgram STT → Claude (with tools) → Cartesia TTS + image overlay.
 // Background page owns the EventBus for cross-window IPC.
 
-// Tools Claude can call mid-response. show_image displays a reference diagram on the overlay.
+// Tools Claude can call mid-response.
 const JINTO_TOOLS = [
   {
     name: 'show_image',
     description:
-      'Display a reference diagram to the player on their in-game overlay. Call this whenever your spoken answer is based on a lesson that has an associated image (e.g. a wall placement diagram). Pass the exact image_id given in that lesson. Do not call it for lessons without an image.',
+      'Display ONE reference diagram for a single specific spot or lineup. Pass an image_id from the DIAGRAMS list. Use this for a single-spot question, not for a whole multi-piece setup.',
     input_schema: {
       type: 'object',
       properties: {
-        image_id: {
-          type: 'string',
-          description: 'The image_id from the lesson, e.g. "viper-breeze-a-attack-wall".',
-        },
+        image_id: { type: 'string', description: 'An id from the DIAGRAMS list.' },
       },
       required: ['image_id'],
+    },
+  },
+  {
+    name: 'show_setup',
+    description:
+      'Open a step-by-step setup gallery the player cycles through with their next-key. Use this when the player asks how to SET UP / ANCHOR / DEFEND a site (a multi-piece setup), instead of show_image. Pass a setup_id from the FULL SETUPS list.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        setup_id: { type: 'string', description: 'A setup id from the FULL SETUPS list, e.g. "b-defense".' },
+      },
+      required: ['setup_id'],
     },
   },
 ];
@@ -117,8 +126,12 @@ class BackgroundController {
     console.log('[jinto/bg] PTT hotkey listener registered (' + kHotkeyPTT + ')');
 
     overwolf.settings.hotkeys.onPressed.addListener((e) => {
-      if (e.name !== kHotkeyToggleSettings) return;
-      this._toggleSettingsWindow();
+      if (e.name === kHotkeyToggleSettings) {
+        this._toggleSettingsWindow();
+      } else if (e.name === kHotkeyNext) {
+        // Advance the on-screen setup gallery to the next step.
+        this.eventBus.trigger('next-diagram', true);
+      }
     });
   }
 
@@ -372,23 +385,42 @@ class BackgroundController {
   }
 
   /**
-   * Handle a tool call from Claude. Currently only show_image.
+   * Handle a tool call from Claude: show_image (one diagram) or show_setup (a step gallery).
    */
   _handleToolCall(toolName, input) {
-    if (toolName !== 'show_image') return;
-    const id = input && input.image_id;
-    if (!id) return;
-
-    const known = (typeof getKnownImageIds === 'function') ? getKnownImageIds() : new Set();
-    if (!known.has(id)) {
-      console.warn('[jinto/bg] show_image: unknown image_id "' + id + '" — dropping');
+    if (toolName === 'show_image') {
+      const id = input && input.image_id;
+      if (!id) return;
+      const known = (typeof getKnownImageIds === 'function') ? getKnownImageIds() : new Set();
+      if (!known.has(id)) {
+        console.warn('[jinto/bg] show_image: unknown image_id "' + id + '" — dropping');
+        return;
+      }
+      console.log('[jinto/bg] show_image:', id);
+      this.eventBus.trigger('show_image', {
+        src: '../../img/overlay/' + id + '.png',
+        alt: id,
+      });
       return;
     }
-    console.log('[jinto/bg] show_image:', id);
-    this.eventBus.trigger('show_image', {
-      src: '../../img/overlay/' + id + '.png',
-      alt: id,
-    });
+
+    if (toolName === 'show_setup') {
+      const setupId = input && input.setup_id;
+      if (!setupId) return;
+      const gs = this.gameState.snapshot();
+      const setup = (typeof getSetupById === 'function') ? getSetupById(gs.agent, gs.map, setupId) : null;
+      if (!setup) {
+        console.warn('[jinto/bg] show_setup: unknown setup "' + setupId + '" — dropping');
+        return;
+      }
+      const steps = (setup.steps || []).map((s) => ({
+        label: s.label || '',
+        src: s.image ? ('../../img/overlay/' + s.image + '.png') : null,
+      }));
+      console.log('[jinto/bg] show_setup:', setupId, '(' + steps.length + ' steps)');
+      this.eventBus.trigger('show_setup', { name: setup.name || '', steps });
+      return;
+    }
   }
 
   /**
