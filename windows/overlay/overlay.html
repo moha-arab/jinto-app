@@ -5,7 +5,7 @@
   <title>jinto — overlay</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="overlay.css">
 </head>
 <body>
@@ -27,11 +27,8 @@
     </div>
   </div>
 
-  <!-- Big diagram panel (right-center): the picture, large enough to actually read -->
-  <div id="jinto-diagram" class="diagram hidden" aria-hidden="true">
-    <img id="image-el" alt="" />
-    <div id="image-caption" class="caption"></div>
-  </div>
+  <!-- Diagram column (top-left, stacks downward): one or more diagrams, populated at runtime -->
+  <div id="jinto-diagrams" class="diagrams"></div>
 
   <script src="../../scripts/services/event-bus.js"></script>
   <script src="overlay.js"></script>

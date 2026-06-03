@@ -1,20 +1,18 @@
-// overlay.js — controls the in-game overlay.
-// Small text card (top-right) + big diagram panel (right-center), managed independently.
+// overlay.js — small text card (top-right) + a column of diagrams (top-left, stacks down).
+// Multiple diagrams can show at once; they clear when you ask the next question (or after a timeout).
 
 (function() {
   const els = {
     card: null, statusText: null,
     transcriptRow: null, transcript: null,
     responseRow: null, response: null,
-    diagram: null, imageEl: null, imageCaption: null,
-    brandDot: null, debugText: null,
+    diagrams: null, brandDot: null,
   };
 
   let cardHideTimer = null;
-  let diagramHideTimer = null;
-
-  // Diagram stays up long enough to study while you walk to the spot, then fades.
-  const DIAGRAM_MS = 30000;
+  let diagramsHideTimer = null;
+  const shownIds = new Set(); // dedupe within a single answer
+  const DIAGRAMS_MS = 30000;  // how long diagrams linger after the last one
 
   function init() {
     els.card          = document.getElementById('jinto-card');
@@ -23,13 +21,11 @@
     els.transcript    = document.getElementById('transcript');
     els.responseRow   = document.getElementById('response-row');
     els.response      = document.getElementById('response');
-    els.diagram       = document.getElementById('jinto-diagram');
-    els.imageEl       = document.getElementById('image-el');
-    els.imageCaption  = document.getElementById('image-caption');
+    els.diagrams      = document.getElementById('jinto-diagrams');
     els.brandDot      = document.querySelector('.brand-dot');
 
     hideCard();
-    hideDiagram();
+    clearDiagrams();
     setState('idle', '');
 
     resizeToGame();
@@ -62,13 +58,13 @@
   function handleEvent(name, payload) {
     if (name === 'ptt') {
       if (payload === 'down') {
-        // New question — reset the card, and clear any diagram from the last answer.
+        // New question — reset card, wipe the diagram column from the last answer.
         clearCardHide();
         setState('listening', '');
         els.transcript.textContent = '';
         els.transcriptRow.classList.add('hidden');
         els.responseRow.classList.add('hidden');
-        hideDiagram();
+        clearDiagrams();
         showCard();
         els.brandDot.classList.add('pulse');
       } else if (payload === 'up') {
@@ -89,33 +85,57 @@
     if (name === 'state') {
       setState(payload.key, payload.label);
       if (payload.key === 'idle' && (payload.label === 'done' || payload.label === 'no speech' || payload.label === 'heard you')) {
-        // Text card fades quickly. The diagram (if any) runs on its own longer timer.
         scheduleCardHide(4500);
       }
     }
 
     if (name === 'show_image') {
-      if (payload && payload.src) {
-        els.imageEl.src = payload.src;
-        els.imageEl.alt = payload.alt || '';
-        els.imageCaption.textContent = payload.caption || captionFromId(payload.alt || '');
-        showDiagram();
-        scheduleDiagramHide(DIAGRAM_MS);
-      }
+      if (payload && payload.src) addDiagram(payload.src, payload.alt || '', payload.caption || '');
     }
 
-    if (name === 'hide_image') hideDiagram();
-    if (name === 'hide_overlay') { hideCard(); hideDiagram(); }
+    if (name === 'hide_image') clearDiagrams();
+    if (name === 'hide_overlay') { hideCard(); clearDiagrams(); }
+  }
+
+  // ---- diagram column ----
+
+  function addDiagram(src, id, caption) {
+    if (!els.diagrams) return;
+    if (id && shownIds.has(id)) return; // already showing this one this turn
+    if (id) shownIds.add(id);
+
+    const card = document.createElement('div');
+    card.className = 'diagram-card';
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = id || '';
+    card.appendChild(img);
+
+    const cap = document.createElement('div');
+    cap.className = 'cap';
+    cap.textContent = caption || captionFromId(id);
+    card.appendChild(cap);
+
+    els.diagrams.appendChild(card);
+
+    // restart the linger timer each time a new diagram arrives
+    if (diagramsHideTimer) clearTimeout(diagramsHideTimer);
+    diagramsHideTimer = setTimeout(clearDiagrams, DIAGRAMS_MS);
+  }
+
+  function clearDiagrams() {
+    if (els.diagrams) els.diagrams.innerHTML = '';
+    shownIds.clear();
+    if (diagramsHideTimer) { clearTimeout(diagramsHideTimer); diagramsHideTimer = null; }
   }
 
   function captionFromId(id) {
     if (!id) return '';
-    return id
-      .replace(/^killjoy-ascent-/, '')
-      .replace(/^viper-breeze-/, '')
-      .replace(/-/g, ' ')
-      .trim();
+    return id.replace(/^killjoy-ascent-/, '').replace(/^viper-breeze-/, '').replace(/-/g, ' ').trim();
   }
+
+  // ---- text card ----
 
   function setState(key, label) {
     if (els.statusText) {
@@ -123,21 +143,10 @@
       els.statusText.textContent = label || key;
     }
   }
-
   function showCard() { if (els.card) els.card.classList.remove('hidden'); }
   function hideCard() { if (els.card) els.card.classList.add('hidden'); clearCardHide(); }
   function scheduleCardHide(ms) { clearCardHide(); cardHideTimer = setTimeout(hideCard, ms); }
   function clearCardHide() { if (cardHideTimer) { clearTimeout(cardHideTimer); cardHideTimer = null; } }
-
-  function showDiagram() { if (els.diagram) els.diagram.classList.remove('hidden'); }
-  function hideDiagram() {
-    if (els.diagram) els.diagram.classList.add('hidden');
-    if (diagramHideTimer) { clearTimeout(diagramHideTimer); diagramHideTimer = null; }
-  }
-  function scheduleDiagramHide(ms) {
-    if (diagramHideTimer) clearTimeout(diagramHideTimer);
-    diagramHideTimer = setTimeout(hideDiagram, ms);
-  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
