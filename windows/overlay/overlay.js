@@ -1,54 +1,46 @@
-// overlay.js — controls the in-game overlay UI.
-// Subscribes to background EventBus and updates the card visually.
+// overlay.js — controls the in-game overlay.
+// Small text card (top-right) + big diagram panel (right-center), managed independently.
 
 (function() {
   const els = {
-    card: null,
-    statusText: null,
-    transcriptRow: null,
-    transcript: null,
-    responseRow: null,
-    response: null,
-    imageSlot: null,
-    imageEl: null,
-    brandDot: null,
+    card: null, statusText: null,
+    transcriptRow: null, transcript: null,
+    responseRow: null, response: null,
+    diagram: null, imageEl: null, imageCaption: null,
+    brandDot: null, debugText: null,
   };
 
-  let hideTimer = null;
-  let imageShown = false;
+  let cardHideTimer = null;
+  let diagramHideTimer = null;
+
+  // Diagram stays up long enough to study while you walk to the spot, then fades.
+  const DIAGRAM_MS = 30000;
 
   function init() {
-    els.card           = document.getElementById('jinto-card');
-    els.statusText     = document.getElementById('status-text');
-    els.transcriptRow  = document.getElementById('transcript-row');
-    els.transcript     = document.getElementById('transcript');
-    els.responseRow    = document.getElementById('response-row');
-    els.response       = document.getElementById('response');
-    els.imageSlot      = document.getElementById('image-slot');
-    els.imageEl        = document.getElementById('image-el');
-    els.brandDot       = document.querySelector('.brand-dot');
-    els.debugText      = document.getElementById('debug-text');
+    els.card          = document.getElementById('jinto-card');
+    els.statusText    = document.getElementById('status-text');
+    els.transcriptRow = document.getElementById('transcript-row');
+    els.transcript    = document.getElementById('transcript');
+    els.responseRow   = document.getElementById('response-row');
+    els.response      = document.getElementById('response');
+    els.diagram       = document.getElementById('jinto-diagram');
+    els.imageEl       = document.getElementById('image-el');
+    els.imageCaption  = document.getElementById('image-caption');
+    els.brandDot      = document.querySelector('.brand-dot');
 
-    // Minimal mode: stay hidden by default. Only appears during PTT/answer/done.
-    setState('idle', '');
     hideCard();
-    debug('overlay ready (hidden)');
+    hideDiagram();
+    setState('idle', '');
 
-    // Resize this window to match the game's actual viewport so CSS top-right anchors correctly.
     resizeToGame();
 
-    // Wire up to background EventBus
     try {
       const main = overwolf.windows.getMainWindow();
       const bus = main && main.jintoEventBus;
-      if (!bus) {
-        debug('NO EVENT BUS on main window');
-        return;
-      }
-      bus.addListener(handleEvent);
-      debug('connected to event bus');
+      if (bus) bus.addListener(handleEvent);
+      else console.warn('[jinto/overlay] no event bus on main window');
     } catch (err) {
-      debug('event bus error: ' + err.message);
+      console.error('[jinto/overlay] bus wiring failed', err);
     }
   }
 
@@ -58,38 +50,25 @@
       const w = gameInfo.logicalWidth || gameInfo.width;
       const h = gameInfo.logicalHeight || gameInfo.height;
       if (!w || !h) return;
-
       overwolf.windows.getCurrentWindow((cur) => {
         if (!cur || !cur.success || !cur.window) return;
         overwolf.windows.changeSize(cur.window.id, w, h, () => {
-          overwolf.windows.changePosition(cur.window.id, 0, 0, () => {
-            debug('overlay sized ' + w + 'x' + h);
-          });
+          overwolf.windows.changePosition(cur.window.id, 0, 0, () => {});
         });
       });
     });
   }
 
-  function debug(msg) {
-    if (els.debugText) {
-      const t = new Date();
-      const ts = t.toTimeString().slice(0, 8);
-      els.debugText.textContent = '[' + ts + '] ' + msg;
-    }
-    console.log('[jinto/overlay]', msg);
-  }
-
   function handleEvent(name, payload) {
     if (name === 'ptt') {
-      debug('PTT ' + payload);
       if (payload === 'down') {
-        clearHide();
+        // New question — reset the card, and clear any diagram from the last answer.
+        clearCardHide();
         setState('listening', '');
         els.transcript.textContent = '';
         els.transcriptRow.classList.add('hidden');
         els.responseRow.classList.add('hidden');
-        els.imageSlot.classList.add('hidden');
-        imageShown = false;
+        hideDiagram();
         showCard();
         els.brandDot.classList.add('pulse');
       } else if (payload === 'up') {
@@ -109,39 +88,33 @@
 
     if (name === 'state') {
       setState(payload.key, payload.label);
-      debug('state: ' + payload.label);
-      // Auto-hide after jinto finishes. Keep diagrams up longer so the player can study them.
       if (payload.key === 'idle' && (payload.label === 'done' || payload.label === 'no speech' || payload.label === 'heard you')) {
-        scheduleHide(imageShown ? 11000 : 4000);
+        // Text card fades quickly. The diagram (if any) runs on its own longer timer.
+        scheduleCardHide(4500);
       }
-    }
-
-    if (name === 'game-state') {
-      const a = payload.agent || '?';
-      const m = payload.map || '?';
-      debug('game: ' + a + ' / ' + m);
-    }
-
-    if (name === 'gep-registered') {
-      debug('gep: ' + (payload ? 'registered' : 'failed'));
     }
 
     if (name === 'show_image') {
-      imageShown = true;
       if (payload && payload.src) {
         els.imageEl.src = payload.src;
         els.imageEl.alt = payload.alt || '';
-        els.imageSlot.classList.remove('hidden');
+        els.imageCaption.textContent = payload.caption || captionFromId(payload.alt || '');
+        showDiagram();
+        scheduleDiagramHide(DIAGRAM_MS);
       }
     }
 
-    if (name === 'hide_image') {
-      els.imageSlot.classList.add('hidden');
-    }
+    if (name === 'hide_image') hideDiagram();
+    if (name === 'hide_overlay') { hideCard(); hideDiagram(); }
+  }
 
-    if (name === 'hide_overlay') {
-      hideCard();
-    }
+  function captionFromId(id) {
+    if (!id) return '';
+    return id
+      .replace(/^killjoy-ascent-/, '')
+      .replace(/^viper-breeze-/, '')
+      .replace(/-/g, ' ')
+      .trim();
   }
 
   function setState(key, label) {
@@ -151,25 +124,19 @@
     }
   }
 
-  function showCard() {
-    if (els.card) els.card.classList.remove('hidden');
-  }
+  function showCard() { if (els.card) els.card.classList.remove('hidden'); }
+  function hideCard() { if (els.card) els.card.classList.add('hidden'); clearCardHide(); }
+  function scheduleCardHide(ms) { clearCardHide(); cardHideTimer = setTimeout(hideCard, ms); }
+  function clearCardHide() { if (cardHideTimer) { clearTimeout(cardHideTimer); cardHideTimer = null; } }
 
-  function hideCard() {
-    if (els.card) els.card.classList.add('hidden');
-    clearHide();
+  function showDiagram() { if (els.diagram) els.diagram.classList.remove('hidden'); }
+  function hideDiagram() {
+    if (els.diagram) els.diagram.classList.add('hidden');
+    if (diagramHideTimer) { clearTimeout(diagramHideTimer); diagramHideTimer = null; }
   }
-
-  function scheduleHide(ms) {
-    clearHide();
-    hideTimer = setTimeout(() => hideCard(), ms);
-  }
-
-  function clearHide() {
-    if (hideTimer) {
-      clearTimeout(hideTimer);
-      hideTimer = null;
-    }
+  function scheduleDiagramHide(ms) {
+    if (diagramHideTimer) clearTimeout(diagramHideTimer);
+    diagramHideTimer = setTimeout(hideDiagram, ms);
   }
 
   if (document.readyState === 'loading') {

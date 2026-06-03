@@ -1,4 +1,4 @@
-/* ===== jinto overlay — top-left, minimal, image-forward ===== */
+/* ===== jinto overlay — small text card (top-right) + big diagram panel (right-center) ===== */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -14,138 +14,94 @@ html, body {
   pointer-events: none;
 }
 
-/* ===== card — top-left, slides in from the left ===== */
+/* ============ TEXT CARD (top-right) ============ */
 
 #jinto-card {
   position: fixed;
   top: 22px;
   right: 22px;
-  width: 312px;
-
+  width: 320px;
   display: flex;
-  background: rgba(9, 9, 12, 0.72);
+  background: rgba(9, 9, 12, 0.78);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 12px;
   overflow: hidden;
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
-  box-shadow:
-    0 8px 28px rgba(0, 0, 0, 0.45),
-    0 1px 0 rgba(255, 255, 255, 0.04) inset;
-
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
   opacity: 1;
   transform: translateX(0);
-  transition: opacity 300ms cubic-bezier(0.2, 0.8, 0.2, 1),
-              transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity 280ms ease, transform 280ms ease;
 }
-
 #jinto-card.hidden {
   opacity: 0;
   transform: translateX(10px);
   pointer-events: none;
 }
 
-/* thin lime accent rail down the left edge */
 .rail {
   flex: 0 0 3px;
   align-self: stretch;
   background: linear-gradient(180deg, #C6FF3D 0%, rgba(198, 255, 61, 0.25) 100%);
 }
+.inner { flex: 1 1 auto; padding: 11px 14px 13px; min-width: 0; }
 
-.inner {
-  flex: 1 1 auto;
-  padding: 11px 14px 13px;
-  min-width: 0;
-}
+.hdr { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(198, 255, 61, 0.4); transition: background 220ms ease, box-shadow 220ms ease, transform 220ms ease; }
+.brand-dot.pulse { background: #C6FF3D; box-shadow: 0 0 11px rgba(198, 255, 61, 0.75); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.35);opacity:0.55;} }
+.wm { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: rgba(244, 241, 234, 0.92); }
+.status { margin-left: auto; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(244, 241, 234, 0.3); }
 
-/* ===== header ===== */
-
-.hdr {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 8px;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(198, 255, 61, 0.4);
-  transition: background 220ms ease, box-shadow 220ms ease, transform 220ms ease;
-}
-
-.brand-dot.pulse {
-  background: #C6FF3D;
-  box-shadow: 0 0 11px rgba(198, 255, 61, 0.75);
-  animation: pulse 1s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50%      { transform: scale(1.35); opacity: 0.55; }
-}
-
-.wm {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: rgba(244, 241, 234, 0.92);
-}
-
-.status {
-  margin-left: auto;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 9px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(244, 241, 234, 0.3);
-}
-
-/* ===== you said (tiny STT feedback) ===== */
-
-.ask {
-  font-size: 11px;
-  line-height: 1.4;
-  color: rgba(244, 241, 234, 0.4);
-  font-style: italic;
-  margin-bottom: 8px;
-}
-
+.ask { font-size: 11px; line-height: 1.4; color: rgba(244, 241, 234, 0.4); font-style: italic; margin-bottom: 8px; }
 .ask.hidden { display: none; }
+.say { font-size: 13.5px; line-height: 1.5; color: #F4F1EA; }
+.say.hidden { display: none; }
 
-/* ===== diagram ===== */
+/* ============ BIG DIAGRAM PANEL (right-center) ============ */
 
-.shot {
-  margin-bottom: 9px;
-  border-radius: 8px;
+#jinto-diagram {
+  position: fixed;
+  top: 50%;
+  right: 26px;
+  transform: translateY(-50%);
+  width: 680px;
+  max-width: 46vw;
+
+  background: rgba(8, 8, 11, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 16px 50px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(198, 255, 61, 0.12) inset;
+
   opacity: 1;
-  transition: opacity 260ms ease;
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+#jinto-diagram.hidden {
+  opacity: 0;
+  transform: translateY(-50%) translateX(16px);
+  pointer-events: none;
 }
 
-.shot.hidden { display: none; }
-
-.shot img {
+#jinto-diagram img {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 240px;
+  max-height: 74vh;
   object-fit: contain;
+  background: #0b0b0f;
 }
 
-/* ===== jinto's answer ===== */
-
-.say {
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: #F4F1EA;
-  font-weight: 400;
+.caption {
+  padding: 8px 14px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.35);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #C6FF3D;
 }
-
-.say.hidden { display: none; }
-
-/* hidden in this minimal layout */
-.debug-strip { display: none; }
+.caption:empty { display: none; }
