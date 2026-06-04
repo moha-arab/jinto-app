@@ -6,7 +6,7 @@
     "author": "jinto.gg",
     "version": "0.1.0",
     "minimum-overwolf-version": "0.224.0",
-    "description": "Voice AI tutor for Valorant agents - learn Viper, Killjoy, Jett, Breach while you play.",
+    "description": "Voice AI coach for Valorant. Learn how to play Killjoy on Ascent by voice, with setups and lineups shown on screen.",
     "icon": "icons/IconMouseOver.png",
     "icon_gray": "icons/IconMouseNormal.png",
     "launcher_icon": "icons/desktop-icon.ico",
@@ -30,7 +30,7 @@
       "jinto_next": {
         "title": "jinto — next diagram",
         "action-type": "custom",
-        "default": "N"
+        "default": "H"
       }
     },
     "externally_connectable": {

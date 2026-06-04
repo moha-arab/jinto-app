@@ -79,6 +79,7 @@
     }
 
     if (name === 'transcript') {
+      clearGallery();          // new question → drop the previous answer's diagram (robust even if ptt-down was missed)
       els.transcript.textContent = payload || '';
       els.transcriptRow.classList.remove('hidden');
     }

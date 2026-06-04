@@ -1,9 +1,8 @@
 // content/index.js — registry mapping "agent|map" → content module.
-// V1 ALPHA: Viper on Breeze ONLY. Other agents added once this one is perfect.
+// V1: Killjoy on Ascent ONLY (rebuilding from verified gameplay). More combos added once this one is perfect.
 
 const JINTO_CONTENT = (function() {
   const modules = [
-    VIPER_BREEZE,
     KILLJOY_ASCENT,
   ];
   const map = {};
@@ -57,7 +56,7 @@ function getKnownSetupIds() {
 /**
  * Render a combo's knowledge as a prompt block for Claude.
  * Knowledge-shaped modules (preferred) → rich knowledge + a diagram list to reason over.
- * Lesson-shaped modules (legacy, e.g. Viper/Breeze) → the lesson list.
+ * Lesson-shaped modules (legacy format) → the lesson list.
  */
 function renderLessonsForPrompt(module) {
   if (!module) {

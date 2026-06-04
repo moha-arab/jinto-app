@@ -256,7 +256,7 @@ class BackgroundController {
     if (reason && knowState) {
       const refusal = (typeof buildRefusalLine === 'function')
         ? buildRefusalLine(reason, gs.agent)
-        : "Right now I coach Viper on Breeze and Killjoy on Ascent. More coming soon.";
+        : "Right now I coach Killjoy on Ascent. More coming soon.";
       console.log('[jinto/bg] code-gate refusal:', reason, gs.agent, gs.map);
       this.eventBus.trigger('state', { key: 'speaking', label: 'refusing' });
       this.eventBus.trigger('response', refusal);
