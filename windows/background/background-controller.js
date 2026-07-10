@@ -64,6 +64,13 @@ class BackgroundController {
     this.conversation = []; // {role, content} pairs, capped at 20
 
     this._pttDown = false;
+
+    // Turn supersession: every turn entry (PTT press or typed question) bumps the sequence.
+    // A turn that finishes preparing (e.g. voice transcription) only answers if it is STILL
+    // the newest turn — otherwise two Claude streams could run concurrently and corrupt
+    // events, history, and TTS.
+    this._turnSeq = 0;
+    this._voiceTurn = 0;
   }
 
   async run() {
@@ -171,6 +178,7 @@ class BackgroundController {
   async _handlePTTDown() {
     if (this._pttDown) return;
     this._pttDown = true;
+    this._voiceTurn = ++this._turnSeq;
 
     // Barge-in: kill anything still in flight from the previous turn before starting fresh.
     this._cancelInFlight();
@@ -210,6 +218,7 @@ class BackgroundController {
   async _handlePTTUp() {
     if (!this._pttDown) return;
     this._pttDown = false;
+    const myTurn = this._voiceTurn;
 
     this.eventBus.trigger('ptt', 'up');
     this.eventBus.trigger('state', { key: 'thinking', label: 'transcribing' });
@@ -233,6 +242,12 @@ class BackgroundController {
     }
 
     console.log('[jinto/bg] final transcript:', finalText);
+
+    // Superseded while transcribing (e.g. a typed question came in)? Drop this turn silently.
+    if (myTurn !== this._turnSeq) {
+      console.log('[jinto/bg] voice turn superseded — dropping');
+      return;
+    }
     this.eventBus.trigger('transcript', finalText);
 
     if (!finalText) {
@@ -240,14 +255,53 @@ class BackgroundController {
       return;
     }
 
-    // Phase 2b: send transcript to Claude, stream response back to overlay
+    await this._answer(finalText, { speak: true });
+  }
+
+  /**
+   * Pretend mode / dev harness: ask jinto with typed text.
+   * Same pipeline as voice (refusal gate, Claude, tools, history) minus mic+STT.
+   * opts.speak (default false) also runs TTS.
+   */
+  async askText(text, opts = {}) {
+    const q = (text || '').trim();
+    if (!q) return;
+    this._turnSeq++; // supersede any voice turn that is mid-capture or mid-transcription
+    if (this._pttDown) {
+      this._pttDown = false;
+      try { this.audio.stop(); } catch (_) {}
+    }
+    if (this.stt) {
+      try { this.stt.close(); } catch (_) {}
+      this.stt = null;
+    }
+    this._cancelInFlight();
+    this.eventBus.trigger('state', { key: 'thinking', label: 'typed question' });
+    this.eventBus.trigger('transcript', q);
+    this.eventBus.trigger('response', '');
+    await this._answer(q, { speak: !!opts.speak });
+  }
+
+  /** Dev harness: the system prompt exactly as Claude would see it right now. */
+  dumpPrompt() {
+    return buildSystemPrompt(this.gameState.snapshot());
+  }
+
+  /**
+   * Shared answer flow for voice and typed questions:
+   * code-gate refusal → conversation history → Claude stream (tools) → TTS.
+   * opts.speak=false runs silently (text + diagrams only) — used by typed questions.
+   */
+  async _answer(finalText, opts = {}) {
+    const speak = opts.speak !== false;
+
     if (!this.claude) {
       this.eventBus.trigger('state', { key: 'idle', label: 'no claude key' });
       this.eventBus.trigger('response', '(Anthropic key missing)');
       return;
     }
 
-    // Phase 3: code-gate refusal for out-of-scope combos.
+    // Code-gate refusal for out-of-scope combos.
     // Only triggers when we KNOW the agent+map and they're definitely not in scope.
     // If GEP data is missing (agent/map unknown), let Claude handle it — it'll ask the user.
     const gs = this.gameState.snapshot();
@@ -260,17 +314,19 @@ class BackgroundController {
       console.log('[jinto/bg] code-gate refusal:', reason, gs.agent, gs.map);
       this.eventBus.trigger('state', { key: 'speaking', label: 'refusing' });
       this.eventBus.trigger('response', refusal);
-      this._speak(refusal);
-      if (this.ttsProvider === 'cartesia' && this.tts) {
-        try {
-          await this.tts.connect();
-          this.tts.onAudioChunk = (b64) => this.player.enqueueChunk(b64);
-          this.tts.startContext();
-          this.tts.sendText(refusal, false);
-          this.tts.finish();
-          setTimeout(() => { if (this.tts) this.tts.close(); }, 6000);
-        } catch (err) {
-          console.error('[jinto/bg] cartesia refusal failed', err);
+      if (speak) {
+        this._speak(refusal);
+        if (this.ttsProvider === 'cartesia' && this.tts) {
+          try {
+            await this.tts.connect();
+            this.tts.onAudioChunk = (b64) => this.player.enqueueChunk(b64);
+            this.tts.startContext();
+            this.tts.sendText(refusal, false);
+            this.tts.finish();
+            setTimeout(() => { if (this.tts) this.tts.close(); }, 6000);
+          } catch (err) {
+            console.error('[jinto/bg] cartesia refusal failed', err);
+          }
         }
       }
       setTimeout(() => this.eventBus.trigger('state', { key: 'idle', label: 'done' }), 500);
@@ -289,7 +345,7 @@ class BackgroundController {
     // For Cartesia, open the WebSocket in parallel so it's ready when Claude starts streaming
     let ttsReady = false;
     const ttsReadyPromise = (async () => {
-      if (this.ttsProvider !== 'cartesia' || !this.tts) return;
+      if (!speak || this.ttsProvider !== 'cartesia' || !this.tts) return;
       try {
         await this.tts.connect();
         this.tts.onAudioChunk = (b64) => this.player.enqueueChunk(b64);
@@ -331,7 +387,7 @@ class BackgroundController {
           }
           this.eventBus.trigger('response', accumulated);
           // Stream into Cartesia at clause boundaries for low-latency continuous audio
-          if (this.ttsProvider === 'cartesia') {
+          if (speak && this.ttsProvider === 'cartesia') {
             ttsReadyPromise.then(() => {
               cartesiaBuffer += chunk;
               flushCartesia(false);
@@ -344,14 +400,14 @@ class BackgroundController {
 
       this.conversation.push({ role: 'assistant', content: full });
 
-      if (this.ttsProvider === 'cartesia') {
+      if (speak && this.ttsProvider === 'cartesia') {
         await ttsReadyPromise;
         if (ttsReady) {
           flushCartesia(true);
           this.tts.finish();
           setTimeout(() => { if (this.tts) this.tts.close(); }, 8000);
         }
-      } else if (full && full.trim()) {
+      } else if (speak && full && full.trim()) {
         // OpenAI / WebSpeech path: send full text after Claude completes
         this._speak(full);
       }

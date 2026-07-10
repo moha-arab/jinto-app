@@ -5,6 +5,11 @@ const JINTO_SUPPORTED_COMBOS = [
   { agent: 'Killjoy', map: 'Ascent' },
 ];
 
+/** Cross-window-safe accessor (top-level const isn't reachable via getMainWindow; functions are). */
+function getSupportedCombos() {
+  return JINTO_SUPPORTED_COMBOS.map((c) => ({ agent: c.agent, map: c.map }));
+}
+
 function isSupportedCombo(agent, map) {
   if (!agent || !map) return false;
   return JINTO_SUPPORTED_COMBOS.some(
