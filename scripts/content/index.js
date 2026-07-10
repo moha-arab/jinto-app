@@ -1,10 +1,9 @@
 // content/index.js — registry mapping "agent|map" → content module.
-// V1: Killjoy on Ascent ONLY (rebuilding from verified gameplay). More combos added once this one is perfect.
+// FRESH SLATE: no content loaded. Add a content file + a <script> tag in background.html,
+// then list the module here.
 
 const JINTO_CONTENT = (function() {
-  const modules = [
-    KILLJOY_ASCENT,
-  ];
+  const modules = [];
   const map = {};
   for (const m of modules) {
     if (!m || !m.agent || !m.map) continue;

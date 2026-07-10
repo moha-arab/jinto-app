@@ -102,21 +102,6 @@
       text-align: right;
     }
 
-    /* Text inputs (match select styling) */
-    input[type="text"] {
-      padding: 10px 12px;
-      background: #0B0B0F;
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #F4F1EA;
-      border-radius: 6px;
-      font-family: inherit;
-      font-size: 13px;
-      outline: none;
-    }
-    input[type="text"]:focus { border-color: #C6FF3D; }
-    .pm-grid { display: flex; gap: 8px; }
-    .pm-grid input { flex: 1; min-width: 0; }
-
     /* Select */
     select {
       width: 100%;
@@ -206,57 +191,6 @@
       <div class="section-title">// DEBUG</div>
       <button id="force-snapshot-btn" class="secondary">PULL FRESH GAME STATE</button>
       <p style="font-size: 11px; color: #5A5A66; margin-top: 8px;">Click after you're in a custom game to force-pull current agent/map from Valorant.</p>
-    </div>
-
-    <div class="section">
-      <div class="section-title">// PRETEND MODE — TEST WITHOUT VALORANT</div>
-
-      <div class="pm-grid">
-        <input id="pm-agent" type="text" list="pm-agents" placeholder="agent (e.g. Killjoy)" />
-        <input id="pm-map" type="text" list="pm-maps" placeholder="map (e.g. Ascent)" />
-        <select id="pm-side" style="width: auto;">
-          <option value="attack">attack</option>
-          <option value="defense">defense</option>
-        </select>
-      </div>
-      <datalist id="pm-agents"></datalist>
-      <datalist id="pm-maps"></datalist>
-
-      <div style="display:flex; gap:8px; margin-top:10px; align-items:center;">
-        <button id="pm-apply">APPLY FAKE STATE</button>
-        <button id="pm-clear" class="secondary">CLEAR</button>
-        <span id="pm-ov-status" style="font-size:11px; color:#5A5A66;">override off</span>
-      </div>
-
-      <div style="display:flex; gap:8px; margin-top:16px; align-items:center;">
-        <input id="pm-q" type="text" placeholder='ask jinto by text, e.g. "how do I hold B site?"' style="flex:1; min-width:0;" />
-        <button id="pm-ask">ASK</button>
-      </div>
-      <label style="font-size:11px; color:#B4B4BA; display:flex; gap:6px; align-items:center; margin-top:6px; cursor:pointer;">
-        <input id="pm-speak" type="checkbox" /> speak the answer out loud (uses TTS credits)
-      </label>
-
-      <div id="pm-state" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em; color:#C6FF3D; margin-top:12px;"></div>
-      <div id="pm-transcript" style="font-size:12px; color:#5A5A66; margin-top:4px;"></div>
-      <div id="pm-response" style="font-size:13px; color:#F4F1EA; margin-top:6px; white-space:pre-wrap; line-height:1.5;"></div>
-
-      <div id="pm-gallery" style="display:none; margin-top:12px; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span id="pm-gal-name" style="font-size:12px; color:#C6FF3D;"></span>
-          <span style="display:flex; align-items:center;">
-            <button id="pm-gal-prev" class="secondary" style="padding:4px 12px;">&#8249;</button>
-            <span id="pm-gal-count" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#B4B4BA; margin:0 8px;"></span>
-            <button id="pm-gal-next" class="secondary" style="padding:4px 12px;">&#8250;</button>
-          </span>
-        </div>
-        <div id="pm-gal-label" style="font-size:13px; color:#F4F1EA; margin-bottom:8px;"></div>
-        <img id="pm-gal-img" alt="" style="max-width:100%; border-radius:6px; display:none;" />
-      </div>
-
-      <div style="margin-top:14px;">
-        <button id="pm-dump" class="secondary">DUMP SYSTEM PROMPT</button>
-        <pre id="pm-prompt" style="display:none; margin-top:8px; max-height:260px; overflow:auto; font-size:10px; line-height:1.5; color:#B4B4BA; background:#0B0B0F; border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:10px; white-space:pre-wrap;"></pre>
-      </div>
     </div>
 
     <div class="section">

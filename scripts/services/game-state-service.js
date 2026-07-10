@@ -16,28 +16,6 @@ class GameStateService {
       health: null,
     };
     this._registered = false;
-    this._override = null; // pretend mode: forced state for testing without Valorant
-  }
-
-  /**
-   * Pretend mode: force parts of the game state (agent/map/side/roundPhase/roundNumber)
-   * so the full pipeline can be tested without Valorant running. Real GEP updates keep
-   * flowing into this.state underneath; the override wins in snapshot() until cleared.
-   */
-  setOverride(fields) {
-    this._override = { ...(this._override || {}), ...fields };
-    console.log('[gep] OVERRIDE set:', JSON.stringify(this._override));
-    this.eventBus.trigger('game-state', this.snapshot());
-  }
-
-  clearOverride() {
-    this._override = null;
-    console.log('[gep] override cleared');
-    this.eventBus.trigger('game-state', this.snapshot());
-  }
-
-  isOverridden() {
-    return !!this._override;
   }
 
   start() {
@@ -251,9 +229,9 @@ class GameStateService {
     return name;
   }
 
-  /** Snapshot of current state for the system prompt. Pretend-mode override wins if set. */
+  /** Snapshot of current state for the system prompt. */
   snapshot() {
-    return this._override ? { ...this.state, ...this._override } : { ...this.state };
+    return { ...this.state };
   }
 
   /** Last raw GEP info-update we received, for debugging. */

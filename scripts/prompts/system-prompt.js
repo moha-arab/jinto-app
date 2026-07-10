@@ -2,13 +2,8 @@
 // Grounded strictly in curated lessons — no improvisation. Supports multiple agent/map combos.
 
 const JINTO_SUPPORTED_COMBOS = [
-  { agent: 'Killjoy', map: 'Ascent' },
+  // FRESH SLATE — no combos loaded yet. Add { agent: '...', map: '...' } per content module.
 ];
-
-/** Cross-window-safe accessor (top-level const isn't reachable via getMainWindow; functions are). */
-function getSupportedCombos() {
-  return JINTO_SUPPORTED_COMBOS.map((c) => ({ agent: c.agent, map: c.map }));
-}
 
 function isSupportedCombo(agent, map) {
   if (!agent || !map) return false;
@@ -37,6 +32,7 @@ function mapForAgent(agent) {
 /** e.g. "Viper on Breeze and Killjoy on Ascent" */
 function supportedCombosSentence() {
   const parts = JINTO_SUPPORTED_COMBOS.map((c) => `${c.agent} on ${c.map}`);
+  if (parts.length === 0) return 'no agents yet';
   if (parts.length === 1) return parts[0];
   if (parts.length === 2) return parts[0] + ' and ' + parts[1];
   return parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1];
@@ -44,6 +40,9 @@ function supportedCombosSentence() {
 
 /** The spoken refusal line for a given reason. Used by the code-gate AND the prompt. */
 function buildRefusalLine(reason, agent) {
+  if (JINTO_SUPPORTED_COMBOS.length === 0) {
+    return "I don't have any agent knowledge loaded yet.";
+  }
   if (reason === 'map' && agent) {
     const m = mapForAgent(agent);
     return `I coach ${agent}, but only on ${m} right now. Hop on ${m} and ask me anything.`;
