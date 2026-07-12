@@ -58,6 +58,8 @@
         "file": "windows/desktop/desktop.html",
         "resizable": true,
         "transparent": false,
+        "topmost": true,
+        "grab_keyboard_focus": true,
         "size": { "width": 760, "height": 620 }
       }
     },
