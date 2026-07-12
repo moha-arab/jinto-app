@@ -23,14 +23,9 @@
         "default": "Oemtilde"
       },
       "jinto_toggle_settings": {
-        "title": "Show/hide jinto settings",
+        "title": "Show/hide jinto dashboard",
         "action-type": "toggle",
-        "default": "Ctrl+J"
-      },
-      "jinto_next": {
-        "title": "jinto — next diagram",
-        "action-type": "custom",
-        "default": "H"
+        "default": "Alt+F"
       }
     },
     "externally_connectable": {
@@ -61,11 +56,9 @@
       },
       "desktop": {
         "file": "windows/desktop/desktop.html",
-        "desktop_only": true,
-        "native_window": true,
         "resizable": true,
         "transparent": false,
-        "size": { "width": 760, "height": 560 }
+        "size": { "width": 760, "height": 620 }
       }
     },
     "game_targeting": { "type": "dedicated", "game_ids": [21640] },

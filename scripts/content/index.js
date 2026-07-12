@@ -1,98 +1,31 @@
-// content/index.js — registry mapping "agent|map" → content module.
-// FRESH SLATE: no content loaded. Add a content file + a <script> tag in background.html,
-// then list the module here.
+// content/index.js — agent CORE registry.
+// A core = per-agent, map-agnostic coaching knowledge (PRD scope 1).
+// Each core file pushes onto window.JINTO_CORE_MODULES and gets a <script> tag in
+// background.html BEFORE this file. Entry shape: { agent: 'Jett', patch: '13.00', knowledge: '...' }
 
-const JINTO_CONTENT = (function() {
-  const modules = [];
-  const map = {};
-  for (const m of modules) {
-    if (!m || !m.agent || !m.map) continue;
-    const key = (m.agent + '|' + m.map).toLowerCase();
-    map[key] = m;
+const JINTO_CORES = (function () {
+  const mods = (typeof window !== 'undefined' && window.JINTO_CORE_MODULES) || [];
+  const list = [];
+  for (const m of mods) {
+    if (!m || !m.agent || !m.knowledge) continue;
+    list.push({ agent: m.agent, patch: m.patch || 'unknown', knowledge: m.knowledge });
   }
-  return map;
+  return list;
 })();
 
-/**
- * Look up the content module for an agent+map combo. Null if unsupported.
- */
-function getContentForCombo(agent, map) {
-  if (!agent || !map) return null;
-  const key = (agent + '|' + map).toLowerCase();
-  return JINTO_CONTENT[key] || null;
+/** All loaded cores. */
+function getAllCores() {
+  return JINTO_CORES.slice();
 }
 
-/**
- * Set of valid image IDs across all loaded combos (validates show_image tool calls).
- * Supports both schemas: knowledge-shaped ({images:[{id}]}) and lesson-shaped ({lessons:[{image}]}).
- */
-function getKnownImageIds() {
-  const ids = new Set();
-  for (const key in JINTO_CONTENT) {
-    const m = JINTO_CONTENT[key];
-    for (const im of (m.images || [])) if (im && im.id) ids.add(im.id);
-    for (const l of (m.lessons || [])) if (l && l.image) ids.add(l.image);
-  }
-  return ids;
+/** The core for one agent, or null. */
+function getCore(agent) {
+  if (!agent) return null;
+  const a = String(agent).toLowerCase();
+  return JINTO_CORES.find((c) => c.agent.toLowerCase() === a) || null;
 }
 
-/** Look up a setup by id within an agent+map combo. Null if not found. */
-function getSetupById(agent, map, setupId) {
-  const mod = getContentForCombo(agent, map);
-  if (!mod || !mod.setups) return null;
-  return mod.setups.find((s) => s.id === setupId) || null;
-}
-
-/** Valid setup ids across all combos (validates show_setup tool calls). */
-function getKnownSetupIds() {
-  const ids = new Set();
-  for (const key in JINTO_CONTENT) {
-    for (const s of (JINTO_CONTENT[key].setups || [])) if (s && s.id) ids.add(s.id);
-  }
-  return ids;
-}
-
-/**
- * Render a combo's knowledge as a prompt block for Claude.
- * Knowledge-shaped modules (preferred) → rich knowledge + a diagram list to reason over.
- * Lesson-shaped modules (legacy format) → the lesson list.
- */
-function renderLessonsForPrompt(module) {
-  if (!module) {
-    return '(No knowledge loaded for this combo. If asked anything specific, honestly say you do not have it yet — do not invent.)';
-  }
-
-  // Knowledge-shaped (the good format)
-  if (module.knowledge) {
-    let s = '# YOUR KNOWLEDGE — ' + module.agent + ' on ' + module.map + '\n';
-    s += 'This is the full extent of what you know about this combo. Reason over ALL of it to answer the player in your own words. If something genuinely is not covered, say you do not have it yet — never invent.\n';
-    s += module.knowledge.trim() + '\n';
-    if (module.setups && module.setups.length) {
-      s += '\n# FULL SETUPS\nWhen the player asks how to SET UP / ANCHOR / DEFEND a site (a multi-piece setup), call show_setup with the id below INSTEAD of show_image. It opens a step-by-step gallery the player cycles through, so every placement is covered. Give a one-line spoken summary and let the gallery show the spots.\n';
-      for (const st of module.setups) s += '- ' + st.id + ' — ' + (st.name || '') + '\n';
-    }
-    if (module.images && module.images.length) {
-      s += '\n# DIAGRAMS (single spots)\nFor a question about ONE specific spot or lineup, call show_image with its id (silently). For a whole setup, use show_setup instead.\n';
-      for (const im of module.images) s += '- ' + im.id + ' — ' + (im.when || '') + '\n';
-    }
-    return s;
-  }
-
-  // Legacy lesson-shaped
-  if (module.lessons && module.lessons.length) {
-    const lines = [];
-    lines.push('# YOUR KNOWLEDGE — ' + module.agent + ' on ' + module.map);
-    lines.push('Reason over all of this to answer in your own words. If a question is not covered, say you do not have it yet. Do not invent.');
-    lines.push('');
-    for (const l of module.lessons) {
-      lines.push('## ' + l.id);
-      lines.push(l.short);
-      if (l.expanded) lines.push('More: ' + l.expanded);
-      if (l.image) lines.push('(Diagram available — call show_image with image_id "' + l.image + '".)');
-      lines.push('');
-    }
-    return lines.join('\n');
-  }
-
-  return '(No knowledge loaded for this combo yet — say so honestly, do not invent.)';
+/** Names of agents jinto knows, e.g. ['Jett', 'Clove']. */
+function getSupportedAgents() {
+  return JINTO_CORES.map((c) => c.agent);
 }

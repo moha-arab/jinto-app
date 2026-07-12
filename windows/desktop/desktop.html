@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>jinto — settings</title>
+  <title>jinto — dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -15,191 +15,180 @@
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
-    .app {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 36px 32px;
+    /* Custom title bar — the window is chrome-less (renders in-game), so drag/min/close live here */
+    .titlebar {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px 8px 16px;
+      background: #0B0B0F; border-bottom: 1px solid rgba(255,255,255,0.06);
+      cursor: move; user-select: none;
     }
-    .brand {
-      font-family: 'Anton', sans-serif;
-      font-size: 40px;
-      letter-spacing: 0.02em;
-      margin-bottom: 4px;
+    .tb-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #5A5A66; }
+    .tb-btns { display: flex; gap: 6px; }
+    .tb-btns button {
+      width: 26px; height: 22px; padding: 0; background: transparent; color: #B4B4BA;
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 4px;
+      font-family: inherit; font-size: 13px; line-height: 1; cursor: pointer; text-transform: none; letter-spacing: 0;
     }
+    .tb-btns button:hover { color: #0B0B0F; background: #C6FF3D; border-color: #C6FF3D; opacity: 1; }
+
+    .app { max-width: 640px; margin: 0 auto; padding: 24px 32px 24px; }
+    .brand { font-family: 'Anton', sans-serif; font-size: 36px; letter-spacing: 0.02em; margin-bottom: 2px; }
     .brand-accent { color: #C6FF3D; }
     .subtitle {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #5A5A66;
-      margin-bottom: 32px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: #5A5A66; margin-bottom: 24px;
     }
-
     .section {
-      background: #15151C;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 10px;
-      padding: 20px 24px;
-      margin-bottom: 16px;
+      background: #15151C; border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; padding: 18px 22px; margin-bottom: 14px;
     }
     .section-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: #C6FF3D;
-      margin-bottom: 14px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: #C6FF3D; margin-bottom: 12px;
     }
 
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 8px 0;
-    }
-    .row label {
-      flex: 0 0 90px;
-      font-size: 13px;
-      color: #B4B4BA;
-    }
-    .row .value {
-      flex: 1 1 auto;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: #F4F1EA;
-    }
+    /* Detection */
+    .det-line { font-size: 19px; font-weight: 600; line-height: 1.35; }
+    .det-line .dim { color: #5A5A66; font-weight: 400; }
+    .det-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #5A5A66; margin-top: 6px; letter-spacing: 0.06em; }
 
-    /* Volume slider */
-    .slider-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    /* Knows */
+    .knows { display: flex; flex-wrap: wrap; gap: 8px; }
+    .agent-chip {
+      padding: 6px 12px; border: 1px solid rgba(198,255,61,0.35); border-radius: 999px;
+      font-size: 13px; color: #F4F1EA;
     }
-    .slider {
-      flex: 1;
-      -webkit-appearance: none;
-      appearance: none;
-      height: 4px;
-      background: #26262E;
-      border-radius: 2px;
-      outline: none;
-    }
-    .slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      background: #C6FF3D;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-    .slider-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: #F4F1EA;
-      min-width: 44px;
-      text-align: right;
-    }
+    .agent-chip .patch { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #5A5A66; margin-left: 6px; }
+    .knows-empty { font-size: 13px; color: #5A5A66; }
 
-    /* Select */
+    /* Last exchange */
+    .lx-q { font-size: 12px; color: #5A5A66; font-style: italic; margin-bottom: 6px; }
+    .lx-a { font-size: 13.5px; line-height: 1.55; white-space: pre-wrap; }
+    .lx-empty { font-size: 13px; color: #5A5A66; }
+    .lx-state { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: #C6FF3D; margin-top: 8px; }
+
+    /* Miss log */
+    .miss-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .miss-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #5A5A66; }
+    #miss-list { max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .miss-item { border-left: 2px solid rgba(198,255,61,0.4); padding: 2px 0 2px 10px; }
+    .miss-q { font-size: 13px; line-height: 1.4; }
+    .miss-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #5A5A66; margin-top: 2px; }
+    .miss-empty { font-size: 13px; color: #5A5A66; }
+
+    /* Sliders / selects / buttons */
+    .slider-row { display: flex; align-items: center; gap: 12px; }
+    .slider { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; background: #26262E; border-radius: 2px; outline: none; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: #C6FF3D; border-radius: 50%; cursor: pointer; }
+    .slider-value { font-family: 'JetBrains Mono', monospace; font-size: 12px; min-width: 44px; text-align: right; }
     select {
-      width: 100%;
-      padding: 10px 12px;
-      background: #0B0B0F;
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #F4F1EA;
-      border-radius: 6px;
-      font-family: inherit;
-      font-size: 13px;
-      cursor: pointer;
-      outline: none;
+      width: 100%; padding: 10px 12px; background: #0B0B0F; border: 1px solid rgba(255,255,255,0.08);
+      color: #F4F1EA; border-radius: 6px; font-family: inherit; font-size: 13px; cursor: pointer; outline: none;
     }
     select:focus { border-color: #C6FF3D; }
-
-    /* Buttons */
     button {
-      padding: 9px 16px;
-      background: #C6FF3D;
-      color: #0B0B0F;
-      border: none;
-      border-radius: 6px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      font-weight: 600;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: opacity 120ms ease;
+      padding: 9px 16px; background: #C6FF3D; color: #0B0B0F; border: none; border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; font-weight: 600;
+      cursor: pointer; text-transform: uppercase; transition: opacity 120ms ease;
     }
     button:hover { opacity: 0.86; }
-    button.secondary {
-      background: transparent;
-      color: #F4F1EA;
-      border: 1px solid rgba(255,255,255,0.12);
+    button.secondary { background: transparent; color: #F4F1EA; border: 1px solid rgba(255,255,255,0.12); }
+
+    .row { display: flex; align-items: center; gap: 16px; padding: 6px 0; }
+    .row label { flex: 0 0 90px; font-size: 13px; color: #B4B4BA; }
+    .row .value { flex: 1 1 auto; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+    .note { font-size: 11px; color: #5A5A66; margin-top: 8px; }
+    details.debug summary {
+      cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: 0.22em; text-transform: uppercase; color: #5A5A66; list-style: none;
     }
+    details.debug summary::-webkit-details-marker { display: none; }
+    details.debug[open] summary { color: #C6FF3D; margin-bottom: 10px; }
 
     .footer {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      color: #5A5A66;
-      letter-spacing: 0.1em;
-      text-align: center;
-      margin-top: 28px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #5A5A66;
+      letter-spacing: 0.1em; text-align: center; margin-top: 22px;
     }
+    .footer kbd { padding: 1px 5px; border: 1px solid rgba(255,255,255,0.18); border-radius: 3px; color: #F4F1EA; }
   </style>
 </head>
 <body>
+  <div class="titlebar" id="titlebar">
+    <span class="tb-title">jinto — dashboard</span>
+    <span class="tb-btns">
+      <button id="tb-min" title="minimize">–</button>
+      <button id="tb-close" title="close">×</button>
+    </span>
+  </div>
   <div class="app">
     <div class="brand">JINTO<span class="brand-accent">.GG</span></div>
-    <div class="subtitle">// SETTINGS</div>
+    <div class="subtitle">// DASHBOARD</div>
+
+    <div class="section">
+      <div class="section-title">// JINTO SEES</div>
+      <div id="det-line" class="det-line"><span class="dim">checking…</span></div>
+      <div id="det-sub" class="det-sub"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">// JINTO KNOWS</div>
+      <div id="knows" class="knows"><span class="knows-empty">loading…</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">// LAST EXCHANGE</div>
+      <div id="lx-empty" class="lx-empty">Nothing yet — hold your push-to-talk key and ask.</div>
+      <div id="lx-q" class="lx-q" style="display:none;"></div>
+      <div id="lx-a" class="lx-a" style="display:none;"></div>
+      <div id="lx-state" class="lx-state"></div>
+    </div>
+
+    <div class="section">
+      <div class="miss-head">
+        <span class="section-title" style="margin-bottom:0;">// MISS LOG — what jinto couldn't answer</span>
+        <span>
+          <span id="miss-count" class="miss-count"></span>
+          <button id="miss-clear" class="secondary" style="padding:5px 10px; margin-left:8px;">CLEAR</button>
+        </span>
+      </div>
+      <div id="miss-list"><span class="miss-empty">No misses yet.</span></div>
+    </div>
 
     <div class="section">
       <div class="section-title">// VOICE</div>
-
-      <div class="slider-row" style="margin-bottom: 14px;">
+      <div class="slider-row" style="margin-bottom: 12px;">
         <label style="flex: 0 0 70px; font-size: 12px; color: #B4B4BA;">Volume</label>
         <input id="volume-slider" class="slider" type="range" min="0" max="100" value="100" />
         <span id="volume-value" class="slider-value">100%</span>
       </div>
-
-      <div style="margin-bottom: 14px;">
+      <div style="margin-bottom: 12px;">
         <div style="font-size: 12px; color: #B4B4BA; margin-bottom: 6px;">Voice</div>
         <select id="voice-select"></select>
       </div>
-
-      <div style="display: flex; gap: 8px;">
-        <button id="test-voice-btn">▶ test voice</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">// STATUS</div>
-      <div class="row"><label>Hotkey</label><span class="value">backtick ` (push to talk)</span></div>
-      <div class="row"><label>STT</label><span class="value">Deepgram Nova-3</span></div>
-      <div class="row"><label>LLM</label><span class="value">Claude Sonnet 4.6</span></div>
-      <div class="row"><label>TTS</label><span id="tts-status" class="value">Cartesia Sonic-3</span></div>
-      <div class="row"><label>Conversation</label><span id="conv-status" class="value">0 turns</span></div>
-      <div class="row"><label>Agent</label><span id="agent-status" class="value">unknown</span></div>
-      <div class="row"><label>Map</label><span id="map-status" class="value">unknown</span></div>
-      <div class="row"><label>GEP</label><span id="gep-status" class="value">checking...</span></div>
-      <div class="row"><label>Last GEP</label><span id="gep-raw" class="value" style="font-size: 10px; opacity: 0.7;">none yet</span></div>
-      <div class="row"><label>Features</label><span id="gep-features" class="value" style="font-size: 10px; opacity: 0.7;">unknown</span></div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">// DEBUG</div>
-      <button id="force-snapshot-btn" class="secondary">PULL FRESH GAME STATE</button>
-      <p style="font-size: 11px; color: #5A5A66; margin-top: 8px;">Click after you're in a custom game to force-pull current agent/map from Valorant.</p>
+      <button id="test-voice-btn">▶ test voice</button>
     </div>
 
     <div class="section">
       <div class="section-title">// CONVERSATION</div>
-      <p style="font-size: 13px; color: #B4B4BA; margin-bottom: 12px;">jinto remembers up to 20 messages in this session. Reset to start fresh.</p>
+      <div class="row"><label>Memory</label><span id="conv-status" class="value">0 turns</span></div>
       <button id="reset-btn" class="secondary">RESET CONVERSATION</button>
+      <p class="note">Resets automatically when a new match starts.</p>
     </div>
 
-    <div class="footer">BUILD 2026-05-27-PHASE3 · PRESS CTRL+J TO TOGGLE · CLOSE WITH × ABOVE</div>
+    <div class="section">
+      <details class="debug">
+        <summary>// DEBUG</summary>
+        <div class="row"><label>GEP</label><span id="gep-status" class="value">checking…</span></div>
+        <div class="row"><label>Last GEP</label><span id="gep-raw" class="value" style="font-size:10px; opacity:0.7;">none yet</span></div>
+        <div class="row"><label>Features</label><span id="gep-features" class="value" style="font-size:10px; opacity:0.7;">unknown</span></div>
+        <div class="row"><label>TTS</label><span id="tts-status" class="value">—</span></div>
+        <button id="force-snapshot-btn" class="secondary" style="margin-top:6px;">PULL FRESH GAME STATE</button>
+      </details>
+    </div>
+
+    <div class="footer">HOLD <kbd>`</kbd> TO TALK · <kbd>ALT+F</kbd> TOGGLES THIS DASHBOARD</div>
   </div>
 
   <script src="desktop.js"></script>

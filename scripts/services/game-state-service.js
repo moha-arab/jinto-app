@@ -115,13 +115,23 @@ class GameStateService {
       if (typeof info.match_info.map === 'string') {
         const cleanMap = this._cleanMapName(info.match_info.map);
         if (cleanMap !== this.state.map) {
+          const prevMap = this.state.map;
           this.state.map = cleanMap;
           changed = true;
           console.log('[gep] map raw =', info.match_info.map, '-> display =', cleanMap);
+          // Different real map than the last one → a new match started.
+          if (prevMap && cleanMap && prevMap !== cleanMap) this._newMatch('map change');
         }
       }
       if (info.match_info.team != null) this.state.side = info.match_info.team;
-      if (info.match_info.round_number != null) this.state.roundNumber = parseInt(info.match_info.round_number, 10);
+      if (info.match_info.round_number != null) {
+        const rn = parseInt(info.match_info.round_number, 10);
+        // Round counter fell back to 1 → new match (covers same-map-twice).
+        if (this.state.roundNumber != null && this.state.roundNumber > 1 && rn === 1) {
+          this._newMatch('round reset');
+        }
+        this.state.roundNumber = rn;
+      }
       if (info.match_info.round_phase != null) this.state.roundPhase = info.match_info.round_phase;
       if (info.match_info.score != null) this.state.score = info.match_info.score;
     }
@@ -136,7 +146,13 @@ class GameStateService {
   }
 
   _handleEvent(events) {
-    // Discrete events — match_start, kill, death, spike_planted, etc. Not used in Phase 3 directly.
+    // Discrete events — match_start, kill, death, spike_planted, etc. Not used directly.
+  }
+
+  /** A new match started (map changed or round counter reset). Consumers: conversation auto-reset. */
+  _newMatch(why) {
+    console.log('[gep] new match detected (' + why + ')');
+    this.eventBus.trigger('new-match', why);
   }
 
   /**

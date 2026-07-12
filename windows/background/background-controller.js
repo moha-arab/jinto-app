@@ -5,27 +5,16 @@
 // Tools Claude can call mid-response.
 const JINTO_TOOLS = [
   {
-    name: 'show_image',
+    name: 'log_miss',
     description:
-      'Display ONE reference diagram for a single specific spot or lineup. Pass an image_id from the DIAGRAMS list. Use this for a single-spot question, not for a whole multi-piece setup.',
+      'Silently record a question you could not fully answer from your coaching cores (unsupported agent, map-specific gap, or knowledge genuinely missing from the docs). Call this IN ADDITION to your short honest spoken answer — never instead of it. Never mention this tool or the word "log" to the player. Questions about jinto itself are never misses.',
     input_schema: {
       type: 'object',
       properties: {
-        image_id: { type: 'string', description: 'An id from the DIAGRAMS list.' },
+        question: { type: 'string', description: 'the gist of what the player wanted' },
+        reason: { type: 'string', description: 'one of: unsupported-agent | map-specific | not-in-docs | other' },
       },
-      required: ['image_id'],
-    },
-  },
-  {
-    name: 'show_setup',
-    description:
-      'Open a step-by-step setup gallery the player cycles through with their next-key. Use this when the player asks how to SET UP / ANCHOR / DEFEND a site (a multi-piece setup), instead of show_image. Pass a setup_id from the FULL SETUPS list.',
-    input_schema: {
-      type: 'object',
-      properties: {
-        setup_id: { type: 'string', description: 'A setup id from the FULL SETUPS list, e.g. "b-defense".' },
-      },
-      required: ['setup_id'],
+      required: ['question', 'reason'],
     },
   },
 ];
@@ -62,6 +51,7 @@ class BackgroundController {
     ];
 
     this.conversation = []; // {role, content} pairs, capped at 20
+    this._convEpoch = 0;    // bumped on every reset so an in-flight answer can't write into a fresh conversation
 
     this._pttDown = false;
   }
@@ -73,6 +63,12 @@ class BackgroundController {
     this._registerPTTHotkey();
     this._listenForGameLaunch();
     this.gameState.start();
+
+    // PRD: conversation resets when a new match starts, so last game's advice
+    // (maybe a different agent) can't bleed into this one.
+    this.eventBus.addListener((name) => {
+      if (name === 'new-match') this.resetConversation();
+    });
 
     // If we started up without Valorant running (e.g., user clicked jinto in the dock),
     // open the desktop dashboard so they have something to interact with.
@@ -128,9 +124,6 @@ class BackgroundController {
     overwolf.settings.hotkeys.onPressed.addListener((e) => {
       if (e.name === kHotkeyToggleSettings) {
         this._toggleSettingsWindow();
-      } else if (e.name === kHotkeyNext) {
-        // Advance the on-screen setup gallery to the next step.
-        this.eventBus.trigger('next-diagram', true);
       }
     });
   }
@@ -165,6 +158,7 @@ class BackgroundController {
 
   resetConversation() {
     this.conversation = [];
+    this._convEpoch++;
     console.log('[jinto/bg] conversation reset');
   }
 
@@ -247,42 +241,18 @@ class BackgroundController {
       return;
     }
 
-    // Phase 3: code-gate refusal for out-of-scope combos.
-    // Only triggers when we KNOW the agent+map and they're definitely not in scope.
-    // If GEP data is missing (agent/map unknown), let Claude handle it — it'll ask the user.
-    const gs = this.gameState.snapshot();
-    const knowState = !!(gs.agent && gs.map);
-    const reason = knowState ? refusalReason(gs.agent, gs.map) : null;
-    if (reason && knowState) {
-      const refusal = (typeof buildRefusalLine === 'function')
-        ? buildRefusalLine(reason, gs.agent)
-        : "Right now I coach Killjoy on Ascent. More coming soon.";
-      console.log('[jinto/bg] code-gate refusal:', reason, gs.agent, gs.map);
-      this.eventBus.trigger('state', { key: 'speaking', label: 'refusing' });
-      this.eventBus.trigger('response', refusal);
-      this._speak(refusal);
-      if (this.ttsProvider === 'cartesia' && this.tts) {
-        try {
-          await this.tts.connect();
-          this.tts.onAudioChunk = (b64) => this.player.enqueueChunk(b64);
-          this.tts.startContext();
-          this.tts.sendText(refusal, false);
-          this.tts.finish();
-          setTimeout(() => { if (this.tts) this.tts.close(); }, 6000);
-        } catch (err) {
-          console.error('[jinto/bg] cartesia refusal failed', err);
-        }
-      }
-      setTimeout(() => this.eventBus.trigger('state', { key: 'idle', label: 'done' }), 500);
-      return;
-    }
-
+    // PRD: no hard code-gate. Every question reaches the model; the balanced-refusal rules
+    // live in the system prompt (never a wall, never a hallucination).
     this.eventBus.trigger('state', { key: 'thinking', label: 'thinking' });
     this.eventBus.trigger('response', ''); // clear
 
-    // Add user turn to conversation history (cap at last 20 turns)
+    // Add user turn to conversation history (cap at last 20 entries).
+    const convEpoch = this._convEpoch;
     this.conversation.push({ role: 'user', content: finalText });
     if (this.conversation.length > 20) this.conversation = this.conversation.slice(-20);
+    // The API requires history to START with a user turn; the cap (or a mid-stream reset)
+    // can violate that and would 400 every request from then on.
+    while (this.conversation.length && this.conversation[0].role !== 'user') this.conversation.shift();
 
     let firstDelta = true;
 
@@ -342,7 +312,11 @@ class BackgroundController {
         (toolName, input) => this._handleToolCall(toolName, input)
       );
 
-      this.conversation.push({ role: 'assistant', content: full });
+      if (convEpoch === this._convEpoch) {
+        this.conversation.push({ role: 'assistant', content: full });
+      } else {
+        console.log('[jinto/bg] conversation was reset mid-answer — dropping stale assistant turn');
+      }
 
       if (this.ttsProvider === 'cartesia') {
         await ttsReadyPromise;
@@ -385,42 +359,44 @@ class BackgroundController {
   }
 
   /**
-   * Handle a tool call from Claude: show_image (one diagram) or show_setup (a step gallery).
+   * Handle a tool call from Claude. MVP has ONE tool: log_miss — silent bookkeeping of
+   * questions jinto couldn't answer from its cores (PRD: the improvement backlog).
    */
   _handleToolCall(toolName, input) {
-    if (toolName === 'show_image') {
-      const id = input && input.image_id;
-      if (!id) return;
-      const known = (typeof getKnownImageIds === 'function') ? getKnownImageIds() : new Set();
-      if (!known.has(id)) {
-        console.warn('[jinto/bg] show_image: unknown image_id "' + id + '" — dropping');
-        return;
-      }
-      console.log('[jinto/bg] show_image:', id);
-      this.eventBus.trigger('show_image', {
-        src: '../../img/overlay/' + id + '.png',
-        alt: id,
-      });
-      return;
+    if (toolName !== 'log_miss') return;
+    const q = input && input.question;
+    if (!q) return;
+    const gs = this.gameState.snapshot();
+    const entry = {
+      q: String(q).slice(0, 300),
+      reason: String((input && input.reason) || 'other').slice(0, 40),
+      agent: gs.agent || null,
+      map: gs.map || null,
+      time: Date.now(),
+    };
+    try {
+      const log = this.getMissLog();
+      log.unshift(entry);
+      localStorage.setItem('jinto-miss-log', JSON.stringify(log.slice(0, 200)));
+    } catch (err) {
+      console.warn('[jinto/bg] miss log write failed', err);
     }
+    console.log('[jinto/bg] miss logged:', entry.reason, '—', entry.q);
+    this.eventBus.trigger('miss-logged', entry);
+  }
 
-    if (toolName === 'show_setup') {
-      const setupId = input && input.setup_id;
-      if (!setupId) return;
-      const gs = this.gameState.snapshot();
-      const setup = (typeof getSetupById === 'function') ? getSetupById(gs.agent, gs.map, setupId) : null;
-      if (!setup) {
-        console.warn('[jinto/bg] show_setup: unknown setup "' + setupId + '" — dropping');
-        return;
-      }
-      const steps = (setup.steps || []).map((s) => ({
-        label: s.label || '',
-        src: s.image ? ('../../img/overlay/' + s.image + '.png') : null,
-      }));
-      console.log('[jinto/bg] show_setup:', setupId, '(' + steps.length + ' steps)');
-      this.eventBus.trigger('show_setup', { name: setup.name || '', steps });
-      return;
+  /** The miss log, newest first. */
+  getMissLog() {
+    try {
+      return JSON.parse(localStorage.getItem('jinto-miss-log') || '[]');
+    } catch (_) {
+      return [];
     }
+  }
+
+  clearMissLog() {
+    localStorage.removeItem('jinto-miss-log');
+    this.eventBus.trigger('miss-logged', null);
   }
 
   /**
