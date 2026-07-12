@@ -1,0 +1,64 @@
+# Clove — core
+
+*(written against patch 13.00, July 2026)*
+
+## Who you are on the team
+
+Riot gave the best ability in the game, smokes, to an agent with a duelist's engine: a heal that arms off kills, an ult that un-kills you, a smoke that casts from the grave. That's why Clove tops ranked winrate charts through nerf after nerf: Omen has the higher ceiling on a coordinated team, but his kit converts through teammates and ranked doesn't supply them. The engine only runs near fights, so your job is second body in: smoke for the team, take the trade fight behind the entry, die where the corpse keeps working. The win condition: every fight your team takes happens under your smokes, including the ones after you're dead.
+
+## The kit, for real
+
+**Ruse (smokes).** Two facts run your game: they recharge, and they're short. Near the shortest duration of any controller, with a cast range that won't reach cross-map [VERIFY range; sources disagree]. Recharge kills the usual rationing rule. Smoke early and often: a smoke spent at 1:40 is already recharging and soaks enemy util; hoarding was the confessed leak in the famous Immortal-Reyna-main winless-on-Clove thread. Recharge also makes you the game's cheapest faker: burn smokes on a loud A look, walk off, and the real B hit goes out on recharged charges. A fake that spends Brimstone's whole round costs you thirty seconds of patience. Placement: tight to their side of the choke so pushers exit on one predictable path; slide it toward your own side and you hand them a wide exit cone.
+
+Post-death casting is the signature, and it got gutted: one charge while dead, roughly a six-second smoke [VERIFY 6s], placeable only within range of your corpse [VERIFY the radius]. A dead smoke covers one moment (half a defuse, one retake cross, a one-way on the defuser), so where you die is a smoke lineup. Die at the choke your team has to fight through; a wide lurk death deletes half the agent.
+
+**Not Dead Yet (ult).** A Phoenix ult, not a second life. You need a kill or assist before the timer ends, so a good ult happens where a fight already exists and a teammate can convert. Covered, it wins both ways: enemies turn to shoot the ghost and your teammate kills them mid-turn, or they run and hand over the space. Nobody calls a Killjoy ult that catches no one wasted. The solo panic ult is the throw: re-form in the open, weapon-equip delay, nobody tags your killer, dead twice.
+
+You come back with your gun and your smoke charges, so res-then-smoke is standard: place full-duration living smokes before you die again. Regen shield is reportedly the only shield that survives the revive [VERIFY, and whether Meddle and Pick-Me-Up charges persist]. Hence the ult-round buy: Shorty (out-equips a rifle after re-form, and res fights are doorknob range) plus regen shield. Re-form behind cover or inside your own smoke, and spend the invulnerable window walking toward a teammate, so the chaser hunting the cancel-kill swings into a trade.
+
+**Pick-Me-Up (heal).** It arms off a kill, reportedly an assist too [VERIFY]; if assists count, tagging an enemy a teammate finishes still fuels the engine. The value is the next fight. Insta-popping after every kill is the top Clove habit at every rank: overheal and speed evaporate before anyone re-peeks. Hold it while unpressured and tap it the second before you swing; if you're tagged, let the slow wear off first or the heal comes up short [VERIFY]. The cast is audible to enemies [VERIFY], and Diamond-plus players pre-hold wide for the swing they know is coming, so mix in narrow peeks off the speed. The overheal is 50 now, not the 100 older guides teach [VERIFY].
+
+**Meddle (decay).** Least round-losing part of the kit, so briefly: it forces a decision. The holder either stops swinging while decayed and your team moves, or swings anyway and loses to body shots. Decide the follow-up swing before you throw; the window is short, and Plat-plus players just back off and heal. Lob it around a corner and swing on activation (the field reportedly doesn't bleed back through the wall to your side [VERIFY]), throw it through your own smoke with a spray behind it, or put it on the spike to rip defusers off. The 12.05 radius cut means lazy lobs clip nobody.
+
+## Attack
+
+Default round: move with the pack, smoke the crossfire angles shooting into your approach, and enter second. Your duelist takes contact, you kill whoever trades them. Never first: die before any smoke exists and four teammates hit full defender vision while your corpse lands out of grave-smoke range. Never last or lurking: a deep-lurk death strands the corpse smoke over nothing, with nobody near your ult.
+
+The short duration makes timing the discipline: don't smoke while the team is still clearing main, or the execute happens through thin air. Good defenders won't push your smoke either. They count it down and re-clear as it drops, which kills slow hits, so the re-smoke call is yours: you know the recharge state, and the team crosses on the fresh cast. If the hit keeps stalling, that's what the fake is for.
+
+The engine prices your duels. A 50/50 inside trade range is subsidized: win and Pick-Me-Up pays you into the next fight; lose and you're res bait or a corpse that still smokes the site. The duel you refuse is the Reyna duel, the untradeable off-angle where no dismiss saves you and your corpse reaches nothing. Holding ult widens the license: take first contact on the hit; worst case, you come back as an extra body mid-fight.
+
+Are you the only controller? In ranked you usually are, and then dying at 1:30 doesn't cost a body, it costs every smoke for the rest of the round minus one six-second grave cast. Solo, take your fight after the entry smokes are down and the site fight has started: trade range, not the opening pick. With a second controller, feed earlier; someone can still paint the map.
+
+Post-plant is where Clove is the best controller in ranked, full stop. Bank one smoke for the defuser, always: smoke on the spike forces a blind defuse while your team sprays a known pixel. Phantom over Vandal is a real decision here: no tracers through your own smoke, so the spray never prints your position. Dead post-plant, the banked grave cast covers the half-defuse window; say the six seconds out loud, a smoke nobody plays off is nothing.
+
+## Defense
+
+Anchor a site, opposite your sentinel. Some strong Cloves play aggro mid for the flank pick, death priced in, grave smoke covering the entries anyway. Post-nerf they're wrong: six seconds of corpse smoke doesn't buy back a body fed at 1:30, mid can leave both sites out of cast range [VERIFY], and a mid corpse parks your dead cast where the retake never needs it. Go mid with a read and a fast exit, or not at all.
+
+Re-smoke chaining is your defensive identity: recharge lets you wall a choke nearly continuously. Don't smoke first footsteps; place it when they're close enough that it splits the entry from the bodies behind and blocks the trade. Against flash-heavy comps, set the choke smoke deeper into their tunnel so the flasher exits on a known path you can pre-fire and wallbang. While alive on a choke, build the one-way: smoke high enough that you see feet and they see nothing; Ascent B's version is the green boxes held from Boathouse.
+
+Dead in the opening seconds with a site left weak? Spend the grave cast on the likeliest route in: a dozen seconds of forced clearing often bounces attackers into your stack. Lothar ran this with two smokes pre-nerf; you get one, pick the scarier route. In a 4v5 with attackers committed to your site, don't reflex-smoke main. It can shove them to your weak side and turn a winnable site fight into a losing retake; you need an equalizer, so smoke to isolate: cut one attacker off from their teammates and hand your site player a clean 1v1. Alive at plant time? Stop smoking. Save both charges, announce the retake, sequence them: first smoke walks the group in, second goes on the spike mid-fight so someone can stick or fake the defuse against enemies peeking blind. Spend both early and the retake goes in dry, the most common dead-Clove throw in ranked. Dead at plant time, your one cast goes on the spike.
+
+Defensive ults: never take the long-range one. Attackers back off, the timer expires, you re-die for nothing. Make them commit into a choke or onto site first, where disengaging costs the round.
+
+## Decisions that win or lose rounds
+
+The ult is round equity. Riot designer Dan Hardison's line: it can be correct to ult with no expected kill if the round matters enough for the game state or economy. Body-blocking ten seconds of a 5v4 on an eco-breaking round is a real play. Hoarding it costs whole uses; guides claim three or four a half [VERIFY]. Die first in a winnable round? Res and go; the classic miss is the Clove who plays their life, dies last, and banks it forever. Two hard nos: a chaser inside ten meters with no teammate to trade, and ulting to stop a defuse you can't reach because teammates are pinging you. The wasted-Sage-ult trap; ignore the pings.
+
+An unspent ult on your corpse is pressure by itself: enemies babysit the body or risk a res behind them. Play the babysitter, don't feed them. Res when a teammate can trade, because the cancel-kill hunter walks into the swing; alone, leave it unpressed. The threat already slowed their round, and a res just refunds the kill.
+
+Buys: pistol is Pick-Me-Up, smoke, light shield; the heal is disproportionate on pistols. Ult rounds add Shorty and regen shield. Phantom over Vandal, as covered.
+
+## Mistakes that actually cost rounds
+
+Ranked by rounds burned:
+
+1. **Playing Reyna with smokes.** No dismiss turns Reyna's off-angles into untradeable deaths while your team eats every crossfire unsmoked.
+2. **Not smoking at all.** The single biggest complaint from Clove's own teammates. If your smokes-per-round sits near your kills-per-round, you're the stereotype.
+3. **Dying where your corpse reaches nothing.** Wide deaths delete the grave smoke and the ult conversion in one stroke.
+4. **Solo panic ults.** Re-forming in the open, long-range defensive ults, nobody to trade. Dying twice, at a premium.
+5. **Hoarding recharging smokes.** Clove is the one controller where stinginess is strictly wrong.
+6. **Insta-popping Pick-Me-Up**, then re-fighting at base speed with faded HP.
+7. **Dead-smoke reflexes.** Panic-smoking main in a 4v5, or spending everything before the retake starts.
+8. **Pre-nerf muscle memory.** Planning around long grave smokes, multi-charge dead casting, 100 overheal. All gone.
