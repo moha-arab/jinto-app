@@ -19,7 +19,6 @@
       return;
     }
 
-    initTitlebar();
     initDetection();
     initKnows();
     initLastExchange();
@@ -27,27 +26,6 @@
     initVoice();
     initConversation();
     initDebug();
-  }
-
-  // ---- TITLE BAR (window is chrome-less; hotkeys only fire in-game, so these are the
-  // only move/close controls on desktop) ----
-  function initTitlebar() {
-    $('titlebar').addEventListener('mousedown', (e) => {
-      if (e.target.closest('button')) return;
-      overwolf.windows.getCurrentWindow((w) => {
-        if (w && w.success) overwolf.windows.dragMove(w.window.id);
-      });
-    });
-    $('tb-min').addEventListener('click', () => {
-      overwolf.windows.getCurrentWindow((w) => {
-        if (w && w.success) overwolf.windows.minimize(w.window.id);
-      });
-    });
-    $('tb-close').addEventListener('click', () => {
-      overwolf.windows.getCurrentWindow((w) => {
-        if (w && w.success) overwolf.windows.close(w.window.id);
-      });
-    });
   }
 
   // ---- JINTO SEES ----

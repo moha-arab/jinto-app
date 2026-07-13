@@ -24,23 +24,6 @@
     .scroll-area::-webkit-scrollbar-track { background: transparent; }
     .scroll-area::-webkit-scrollbar-thumb { background: #26262E; border-radius: 4px; }
     .scroll-area::-webkit-scrollbar-thumb:hover { background: #3A3A44; }
-    /* Custom title bar — the window is chrome-less (renders in-game), so drag/min/close live here */
-    .titlebar {
-      flex: 0 0 auto; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 12px 8px 16px;
-      background: #0B0B0F; border-bottom: 1px solid rgba(255,255,255,0.06);
-      cursor: move; user-select: none;
-    }
-    .tb-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #5A5A66; }
-    .tb-btns { display: flex; gap: 6px; }
-    .tb-btns button {
-      width: 26px; height: 22px; padding: 0; background: transparent; color: #B4B4BA;
-      border: 1px solid rgba(255,255,255,0.12); border-radius: 4px;
-      font-family: inherit; font-size: 13px; line-height: 1; cursor: pointer; text-transform: none; letter-spacing: 0;
-    }
-    .tb-btns button:hover { color: #0B0B0F; background: #C6FF3D; border-color: #C6FF3D; opacity: 1; }
-
     .app { max-width: 640px; margin: 0 auto; padding: 24px 32px 24px; }
     .brand { font-family: 'Anton', sans-serif; font-size: 36px; letter-spacing: 0.02em; margin-bottom: 2px; }
     .brand-accent { color: #C6FF3D; }
@@ -124,13 +107,6 @@
   </style>
 </head>
 <body>
-  <div class="titlebar" id="titlebar">
-    <span class="tb-title">jinto — dashboard</span>
-    <span class="tb-btns">
-      <button id="tb-min" title="minimize">–</button>
-      <button id="tb-close" title="close">×</button>
-    </span>
-  </div>
   <div class="scroll-area">
   <div class="app">
     <div class="brand">JINTO<span class="brand-accent">.GG</span></div>
