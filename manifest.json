@@ -60,8 +60,7 @@
         "transparent": false,
         "topmost": true,
         "grab_keyboard_focus": true,
-        "focus_game_takeover": "ReleaseOnHidden",
-        "focus_game_takeover_release_hotkey": "jinto_toggle_settings",
+        "focus_game_takeover": "ReleaseOnLostFocus",
         "size": { "width": 760, "height": 620 }
       }
     },
