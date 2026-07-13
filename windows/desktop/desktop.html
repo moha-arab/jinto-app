@@ -8,16 +8,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* In-game Overwolf windows don't scroll the document — scrolling must happen inside
+       an inner container (.scroll-area). Body stays locked at window height. */
     html, body {
       background: #0B0B0F;
       color: #F4F1EA;
       font-family: 'IBM Plex Sans', system-ui, sans-serif;
-      min-height: 100vh;
+      height: 100%;
+      overflow: hidden;
       -webkit-font-smoothing: antialiased;
     }
+    body { display: flex; flex-direction: column; }
+    .scroll-area { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; }
+    .scroll-area::-webkit-scrollbar { width: 8px; }
+    .scroll-area::-webkit-scrollbar-track { background: transparent; }
+    .scroll-area::-webkit-scrollbar-thumb { background: #26262E; border-radius: 4px; }
+    .scroll-area::-webkit-scrollbar-thumb:hover { background: #3A3A44; }
     /* Custom title bar — the window is chrome-less (renders in-game), so drag/min/close live here */
     .titlebar {
-      position: sticky; top: 0; z-index: 10;
+      flex: 0 0 auto; z-index: 10;
       display: flex; align-items: center; justify-content: space-between;
       padding: 8px 12px 8px 16px;
       background: #0B0B0F; border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -122,6 +131,7 @@
       <button id="tb-close" title="close">×</button>
     </span>
   </div>
+  <div class="scroll-area">
   <div class="app">
     <div class="brand">JINTO<span class="brand-accent">.GG</span></div>
     <div class="subtitle">// DASHBOARD</div>
@@ -189,6 +199,7 @@
     </div>
 
     <div class="footer">HOLD <kbd>`</kbd> TO TALK · <kbd>ALT+F</kbd> TOGGLES THIS DASHBOARD</div>
+  </div>
   </div>
 
   <script src="desktop.js"></script>
