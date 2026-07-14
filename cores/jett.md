@@ -1,10 +1,10 @@
 # Jett — core
 
-*(written against patch 13.00, July 2026. Jett's kit numbers haven't moved since the 7.04 nerfs in 2023; the only functional change since is patch 9.10, late 2024, which made concusses and slow fields cut dash speed in half, covered in Defense. Anything assuming two updrafts, long smokes, or a free anytime dash describes an agent that no longer exists.)*
+*(written against patch 13.00, July 2026. If you learned Jett years ago, unlearn her: one updraft, short smokes, a dash you have to earn. The old version doesn't exist.)*
 
 ## Who you are on the team
 
-You are the crosshair magnet, not the fragger. On attack you go in first so five defenders look at you while your team walks out of the choke and shoots them in the ear. If you die in your smoke and the site falls, you did your job. On defense you're paid aggression: dash makes early info peeks refundable and erases the Operator's weakness, the exposed beat after a shot. Pros have mostly moved to Yoru and Neon (the top two duelists at Masters Santiago 2026, with Jett down to a handful of comps); in ranked she's still the most-picked agent in the game as of patch 13.00, because ranked defenders punish dashes far worse than pros do.
+You are the crosshair magnet, not the fragger. On attack you go in first so five defenders look at you while your team walks out of the choke and shoots them in the ear. If you die in your smoke and the site falls, you did your job. On defense you're paid aggression: dash makes early info peeks refundable and erases the Operator's weakness, the exposed beat after a shot. Pros have mostly moved on to Yoru and Neon; in ranked she's still the most-picked agent in the game, because ranked defenders punish dashes far worse than pros do.
 
 ## The kit, for real
 
@@ -40,7 +40,7 @@ Never lurk on attack: shortest smokes in the game, zero support tools. A lurking
 
 This is where the Operator lives. Dash deletes the sniper's weakness: an armed Tailwind makes it a fight where they risk everything and you risk nothing. Never scope in with dash un-armed; hold long sightlines only (short angles get run-and-gunned by SMGs); one shot, hit or miss, then dash out and set up somewhere new. Off-angles belong to you like nobody else: getting found in one is normally death, for you it's a dash. Take the spot nobody pre-aims, not the default pixel everyone jiggle-checks, and never the same spot two rounds running. After a pick, run the Op toward the other site: their instinct is to rotate away, and you beat them to their own rotate.
 
-Plan the Op like a win condition: Sheriff on defense pistol for the long angles, then off a won pistol, Outlaw round two, Op out by round four (that ladder is patch 13.00 credit math). Lost pistol, don't chain force-buys to rush it.
+Plan the Op like a win condition: Sheriff on defense pistol for the long angles, then off a won pistol, Outlaw round two, Op out by round four. Lost pistol, don't chain force-buys to rush it.
 
 Your smokes have defensive jobs nobody uses. Curve one around a corner to one-way their Op's angle without ever standing in it, landed high enough that only legs show. And when your dash is spent and someone's re-peeking you, look at your feet and smoke yourself: 2.5 seconds is nothing on a rotation and an eternity in a re-peek.
 
@@ -48,7 +48,7 @@ Rifle rounds, do the thing only you get paid for: fight a deep aggressive angle 
 
 Retakes: drop the Op for a rifle; it holds pushes, it doesn't retake sites. Don't dash onto site into the post-plant crossfire: attackers sit two-plus angles on every entrance and the geometry test fails almost every time. Updraft is the better retake key; re-entering at a height nobody holds turns a set crossfire into two people flicking upward. Your smokes are worth roughly nothing here; 2.5 seconds buys one swing, never a defuse.
 
-Concussed, you dash at half speed (a patch 9.10 change that also applies to slow fields like Sage's); the cover you planned around may be out of reach, so back off.
+Concussed, you dash at half speed, and slow fields like Sage's cut it the same; the cover you planned around may be out of reach, so back off.
 
 ## Decisions that win or lose rounds
 

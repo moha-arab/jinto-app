@@ -20,7 +20,7 @@ Rotate heights so nobody sweeps one plane all half. Crouch-head is standard: unj
 
 One-ways: the smoke centers on the emitter, so an emitter on an elevation edge leaves a gap under the bottom rim. You see feet, they see nothing. The principle survives map updates, specific lineups don't, so re-test yours; a botched one-way blinds you while they walk in clean.
 
-**Spycam.** The 11.08 rework (October 2025) made the cam fragile: even parked and dark it shows itself and gives off sound to anyone who comes near, staying in the feed makes that sound carry farther, and a broken one is gone for the better part of a minute. Place it where they can't casually walk near. Tap in, snapshot, tap out; read the red pings off the minimap, since in cam view you're blind and audible. Don't dart every sighting; silent info walking into your team's crossfire beats a tagged enemy hunting the cam.
+**Spycam.** The cam is fragile: even parked and dark it shows itself and gives off sound to anyone who comes near, staying in the feed makes that sound carry farther, and a broken one is gone for the better part of a minute. Place it where they can't casually walk near. Tap in, snapshot, tap out; read the red pings off the minimap, since in cam view you're blind and audible. Don't dart every sighting; silent info walking into your team's crossfire beats a tagged enemy hunting the cam.
 
 Default is the retake cam: parked high, untouched until your team comes back, then pinging exact positions into the re-entry. Discount wallhacks. The barrier-drop cam buys one snapshot then dies: right on pistol or a rush read, wrong as a plan.
 

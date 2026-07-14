@@ -10,6 +10,16 @@ Two readers: **the AI** (reasons from it live, mid-game) and **Mohammad** (verif
 Dense is fine — the AI unpacks dense prose easily. **Ambiguous is never fine** — if Mohammad
 can't follow a sentence, he can't verify it, and the AI may mis-read it too.
 
+## The master rule
+
+**If a human expert Radiant coach wouldn't say it, don't say it.** Every sentence must pass that
+test. A coach speaks current reality in the present tense — "your dart comes back fast enough to
+use twice a round" — and never shows the homework: no patch numbers, no nerf dates, no esports
+event citations, no "since the 11.10 change" in the body. The doc's header patch stamp exists so
+WE know when it was written; the prose acts like the game has always been the way it is now.
+Correcting a stale habit is coach-speak ("it's 50 overheal now, not the 100 you might have
+heard") — citing the patch that changed it is not.
+
 ## Voice
 
 - **Opinionated and earned.** Real takes ("smokes are the best ability in the game") are the
@@ -31,8 +41,9 @@ can't follow a sentence, he can't verify it, and the AI may mis-read it too.
   assume you're revealed") or delete. Nobody asks the coach for patch-note deltas.
 - **No [VERIFY] tags in shipped docs.** Research resolves them before Mohammad reads. If a fact
   genuinely can't be confirmed, REWRITE the advice so it doesn't depend on that fact.
-- **Volatile claims get date-stamped or made durable.** "Tops the winrate charts" rots; either
-  stamp it ("as of patch 13.00") or state the durable reason behind it and drop the chart claim.
+- **Volatile claims get made durable or cut.** "Tops the winrate charts as of patch X" is
+  homework (see the master rule); state the durable reason behind the claim instead. The header
+  stamp is the ONLY date in a doc — it's how we know when "now" was.
 - **Sourcing:** facts come from real, current sources — guides, videos, Reddit mains, and
   Mohammad's own game knowledge (he is a valid source). Never from the AI's own memory.
 - Patch line at the top of every doc: *(written against patch X.XX, month year)*.
