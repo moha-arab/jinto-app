@@ -2,6 +2,22 @@
 // Streaming STT via Deepgram Nova-3 WebSocket.
 // Sends MediaRecorder chunks as they arrive, receives transcripts.
 
+// Keyterm prompting (Nova-3): domain vocabulary Deepgram should expect, so "jinto" doesn't
+// become "gentle" and "A site" doesn't become "a sight". Plain terms, no weights, ~50 max.
+const JINTO_KEYTERMS = [
+  'jinto',
+  'A site', 'B site', 'C site',
+  'spike', 'retake', 'post-plant', 'lineup', 'one-way', 'molly', 'ult', 'eco',
+  'anchor', 'lurk', 'flank', 'trade', 'smokes', 'entry', 'peek', 'rotate',
+  // agents
+  'Jett', 'Clove', 'Sova', 'Cypher', 'Reyna', 'Raze', 'Omen', 'Sage', 'Phoenix',
+  'Chamber', 'Killjoy', 'Viper', 'Brimstone', 'Breach', 'Skye', 'Fade', 'Gekko',
+  'Neon', 'Yoru', 'Iso', 'Deadlock', 'Harbor', 'Astra', 'Vyse', 'Tejo', 'Waylay',
+  // maps
+  'Ascent', 'Bind', 'Haven', 'Split', 'Icebox', 'Breeze', 'Fracture', 'Pearl',
+  'Lotus', 'Sunset', 'Abyss', 'Corrode',
+];
+
 class DeepgramService {
   constructor(apiKey) {
     this.apiKey = apiKey;
@@ -23,6 +39,8 @@ class DeepgramService {
       language: 'en',
       endpointing: '300',
     });
+    // keyterm must repeat per term (no comma lists per Deepgram docs)
+    for (const term of JINTO_KEYTERMS) params.append('keyterm', term);
     const url = `wss://api.deepgram.com/v1/listen?${params.toString()}`;
 
     return new Promise((resolve, reject) => {

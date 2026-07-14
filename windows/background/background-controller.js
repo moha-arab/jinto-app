@@ -281,7 +281,8 @@ class BackgroundController {
         cartesiaBuffer = '';
         return;
       }
-      const matches = [...cartesiaBuffer.matchAll(/[.!?,;:]\s|\n/g)];
+      // Sentence boundaries only — comma/colon fragments made the voice sound stitched together.
+      const matches = [...cartesiaBuffer.matchAll(/[.!?]\s|\n/g)];
       if (matches.length === 0) return;
       const lastMatch = matches[matches.length - 1];
       const lastIdx = lastMatch.index + lastMatch[0].length;
