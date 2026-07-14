@@ -1,6 +1,6 @@
 # Cypher — core
 
-(Written against patch 13.00, July 2026. 13.00 cut the trapwire windup from 0.9s to 0.7s: less time to break a tripped wire before the reveal. The kit was rebuilt in 11.08, October 2025: trips slow and reveal now, no concuss, and the cam warns enemies near it.)
+(Written against patch 13.00, July 2026. How the kit behaves now: trips slow AND reveal on trigger, and breaking a tripped wire in time is rarely realistic, so assume a tripped enemy is marked. No concuss anymore, and the cam warns enemies who get close to it.)
 
 ## Who you are on the team
 
