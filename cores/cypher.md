@@ -20,7 +20,7 @@ Rotate heights so nobody sweeps one plane all half. Crouch-head is standard: unj
 
 One-ways: the smoke centers on the emitter, so an emitter on an elevation edge leaves a gap under the bottom rim. You see feet, they see nothing. The principle survives map updates, specific lineups don't, so re-test yours; a botched one-way blinds you while they walk in clean.
 
-**Spycam.** The rework made the cam fragile: enemies get warned near it even while parked [VERIFY the 11.08 reveal and audio ranges], and a broken one is gone for the better part of a minute [VERIFY the 60s destroy cooldown]. Place it where they can't casually walk near. Tap in, snapshot, tap out; read the red pings off the minimap, since in cam view you're blind and audible. Don't dart every sighting; silent info walking into your team's crossfire beats a tagged enemy hunting the cam.
+**Spycam.** The 11.08 rework (October 2025) made the cam fragile: even parked and dark it shows itself and gives off sound to anyone who comes near, staying in the feed makes that sound carry farther, and a broken one is gone for the better part of a minute. Place it where they can't casually walk near. Tap in, snapshot, tap out; read the red pings off the minimap, since in cam view you're blind and audible. Don't dart every sighting; silent info walking into your team's crossfire beats a tagged enemy hunting the cam.
 
 Default is the retake cam: parked high, untouched until your team comes back, then pinging exact positions into the re-entry. Discount wallhacks. The barrier-drop cam buys one snapshot then dies: right on pistol or a rush read, wrong as a plan.
 
@@ -30,7 +30,7 @@ Default is the retake cam: parked high, untouched until your team comes back, th
 
 Job one: the flank wire goes down the moment your team commits to a path, not when you reach site; placed after they already rotated, it's a monument to a lost round. Deep, where the flank routes converge, because shallow wires get jumped and a flanker reaches an angle on your teammates before one fires. Pick guaranteed activation over clever: a wire they're forced to shoot confirms the flank is live, one they never touch confirms nothing. Then rejoin; babysitting an idle trip is a 4v5 by choice. Re-place it when the team rotates. On multi-flank maps, both wires go to flanks and the cam watches the spike.
 
-Early, throw the cam ahead into main: even if it dies instantly it peeked the angle your duelist was about to dry-peek, and an aggro defender it spots is a free opening pick. [VERIFY: sources don't cover wiring taken map control, like sealing mid behind you; confirm before teaching.]
+Early, throw the cam ahead into main: even if it dies instantly it peeked the angle your duelist was about to dry-peek, and an aggro defender it spots is a free opening pick. When the team takes ground it means to keep, mid above all, wire the door defenders would use to take it back. A quiet wire says the space is still yours and the mid split is still live; a trigger or a break says that option just closed, so call the hit elsewhere. That's the attack web's second product: a running readout of how much map the defense still owns.
 
 In the hit, slot in behind the duelists and stay alive: there is no combat Cypher, and your payout arrives after the plant, which a dead Cypher never places. Your cage patches the controller's gap, the one crossing lane their smokes always leave open. If the smokes are spent when the spike comes out, your cage covers the plant.
 
@@ -46,7 +46,7 @@ Then anchor. Play behind your utility, holding the angle it doesn't cover, and l
 
 Vary the web: run the same setup twice and a coordinated team breaks it with one dart. Change heights, swap the kill-wire side, place late after their utility wave.
 
-Leave your site only on double confirmation: three-plus confirmed at the other site AND your own site quiet; one footstep or one broken wire is exactly what a fake looks like. Take the cam and untriggered wires if there's time; kit guarding an empty site is dead money, though a standing web still delays late re-rotates, so don't sprint back for it under fire [VERIFY: do trips stay armed after you die? Sources conflict; pre-rework they persisted after a 2022 buff].
+Leave your site only on double confirmation: three-plus confirmed at the other site AND your own site quiet; one footstep or one broken wire is exactly what a fake looks like. Take the cam and untriggered wires if there's time; kit guarding an empty site is dead money, though a standing web keeps delaying late re-rotates from anywhere you stand, so don't sprint back for it under fire. The web does die with you: every wire and cam shuts off at your death and shows the enemy exactly where it sat, one more reason there is no combat Cypher.
 
 Retake is why you saved the cam: re-place it high before the team re-enters and you're handing out wallhacks. Cages section the site, smoking the strongest defender-turned-attacker overwatch angle so the retake clears slice by slice instead of eating a crossfire; never cage your own team's re-entry sightline. If the site falls before the retake gathers, back off, group, go together. The solo re-peek costs a body plus whatever's left of your net.
 
@@ -58,9 +58,9 @@ Util out or gun out. The actual climbing skill. Passive web-watching farms low e
 
 Cage discipline. Everything live at the moment they commit; cages burned early get waited out, and the hit lands with your kit down. One cage stays pocketed all round, both sides: attack it denies the defuse, defense it's the smoke you defuse behind when your controller is dead.
 
-Economy. The kit is cheap; buy it in full on save rounds, and pick untriggered wires back up at round end. One flank wire plus a pistol is a real pistol-round buy.
+Economy. The kit runs cheap because wires are refundable: buy it in full even on saves, then pick untriggered wires back up at round end so the web costs you almost nothing across a half. One flank wire plus a pistol is a real pistol-round buy.
 
-Setups. The player this community keeps pointing at, nAts [VERIFY still the reference Cypher in 2026], runs pedestrian setups and wins on decisions. Learn where people actually walk on each map and the most obvious wire keeps catching them.
+Setups. nAts built his reputation on pedestrian setups and better decisions, and that recipe hasn't aged even as the community argues over who holds the Cypher crown now. Learn where people actually walk on each map and the most obvious wire keeps catching them.
 
 ## Mistakes that actually cost rounds
 
