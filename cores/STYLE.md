@@ -46,6 +46,10 @@ can't follow a sentence, he can't verify it, and the AI may mis-read it too.
   smokes for the round; yours costs thirty seconds of recharge."
 - **Jargon is fine, riddles aren't.** Callouts, "choke," "one-way," "refrag" — fine. A sentence
   whose meaning flips depending on how you parse it — rewrite.
+- **Cross-agent comparisons must earn their place.** Keep one only if it changes the player's
+  decision or frames their identity ("Omen converts through teammates; you convert through
+  fights" — keeps). If deleting the comparison loses nothing ("Brimstone's fake costs his whole
+  round" in a Clove doc), delete it. The player is not playing the other agent.
 
 ## Structure (flexible skeleton — asymmetry encouraged)
 
