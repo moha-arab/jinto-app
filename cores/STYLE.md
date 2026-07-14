@@ -44,6 +44,11 @@ heard") — citing the patch that changed it is not.
 - **Volatile claims get made durable or cut.** "Tops the winrate charts as of patch X" is
   homework (see the master rule); state the durable reason behind the claim instead. The header
   stamp is the ONLY date in a doc — it's how we know when "now" was.
+- **Docs contain SLOW facts only. Meta claims are banned outright.** Who pros pick, tier lists,
+  "X is meta/OP/awful" — these rot in weeks (Yoru/Neon were "the meta" one event and nerfed into
+  the ground right after; the doc shipped the stale version). Verified ≠ safe to include: a fact
+  can be true at research time and wrong by the reader's first game. Mechanics, geometry, and
+  decision logic age in years; write those.
 - **Sourcing:** facts come from real, current sources — guides, videos, Reddit mains, and
   Mohammad's own game knowledge (he is a valid source). Never from the AI's own memory.
 - Patch line at the top of every doc: *(written against patch X.XX, month year)*.
@@ -57,6 +62,10 @@ heard") — citing the patch that changed it is not.
   smokes for the round; yours costs thirty seconds of recharge."
 - **Jargon is fine, riddles aren't.** Callouts, "choke," "one-way," "refrag" — fine. A sentence
   whose meaning flips depending on how you parse it — rewrite.
+- **No meta-tier claims about other agents.** "Pros play X and Y now" rots faster than any other
+  fact type and coaches nothing (proof: a draft called Yoru/Neon the top duelists; weeks later
+  Mohammad: "both are awful now"). The only meta claim allowed is the durable WHY about this
+  agent ("ranked defenders punish dashes worse than pros do").
 - **Cross-agent comparisons must earn their place.** Keep one only if it changes the player's
   decision or frames their identity ("Omen converts through teammates; you convert through
   fights" — keeps). If deleting the comparison loses nothing ("Brimstone's fake costs his whole

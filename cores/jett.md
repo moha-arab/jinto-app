@@ -4,7 +4,7 @@
 
 ## Who you are on the team
 
-You are the crosshair magnet, not the fragger. On attack you go in first so five defenders look at you while your team walks out of the choke and shoots them in the ear. If you die in your smoke and the site falls, you did your job. On defense you're paid aggression: dash makes early info peeks refundable and erases the Operator's weakness, the exposed beat after a shot. Pros have mostly moved on to Yoru and Neon; in ranked she's still the most-picked agent in the game, because ranked defenders punish dashes far worse than pros do.
+You are the crosshair magnet, not the fragger. On attack you go in first so five defenders look at you while your team walks out of the choke and shoots them in the ear. If you die in your smoke and the site falls, you did your job. On defense you're paid aggression: dash makes early info peeks refundable and erases the Operator's weakness, the exposed beat after a shot. Pro play drifts on and off her with the meta; in ranked she's a permanent top pick, because ranked defenders punish dashes far worse than pros do.
 
 ## The kit, for real
 
