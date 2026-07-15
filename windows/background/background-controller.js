@@ -54,6 +54,10 @@ class BackgroundController {
     this._convEpoch = 0;    // bumped on every reset so an in-flight answer can't write into a fresh conversation
 
     this._pttDown = false;
+
+    // TTS socket lifecycle: a pending close from an old turn must never kill a newer one.
+    this._ttsTurn = 0;
+    this._ttsCloseTimer = null;
   }
 
   async run() {
@@ -256,6 +260,11 @@ class BackgroundController {
 
     let firstDelta = true;
 
+    // Cancel any pending close from the PREVIOUS turn — otherwise its timer fires mid-answer
+    // and kills the socket this turn is speaking through (text appears, no voice).
+    if (this._ttsCloseTimer) { clearTimeout(this._ttsCloseTimer); this._ttsCloseTimer = null; }
+    const turnId = ++this._ttsTurn;
+
     // For Cartesia, open the WebSocket in parallel so it's ready when Claude starts streaming
     let ttsReady = false;
     const ttsReadyPromise = (async () => {
@@ -263,11 +272,16 @@ class BackgroundController {
       try {
         await this.tts.connect();
         this.tts.onAudioChunk = (b64) => this.player.enqueueChunk(b64);
-        this.tts.onError = (err) => console.error('[jinto/bg] cartesia error', err);
+        this.tts.onError = (err) => {
+          console.error('[jinto/bg] cartesia error', err);
+          this.eventBus.trigger('tts-error', String((err && err.message) || err));
+        };
         this.tts.startContext();
         ttsReady = true;
       } catch (err) {
-        console.error('[jinto/bg] cartesia connect failed', err);
+        // Was silent before: the answer showed as text with no audio and no explanation.
+        console.error('[jinto/bg] cartesia connect FAILED — answer will be text-only', err);
+        this.eventBus.trigger('tts-error', 'voice connection failed: ' + String((err && err.message) || err));
       }
     })();
 
@@ -324,7 +338,11 @@ class BackgroundController {
         if (ttsReady) {
           flushCartesia(true);
           this.tts.finish();
-          setTimeout(() => { if (this.tts) this.tts.close(); }, 8000);
+          // Only close if no newer turn started in the meantime.
+          this._ttsCloseTimer = setTimeout(() => {
+            this._ttsCloseTimer = null;
+            if (this.tts && turnId === this._ttsTurn) this.tts.close();
+          }, 8000);
         }
       } else if (full && full.trim()) {
         // OpenAI / WebSpeech path: send full text after Claude completes

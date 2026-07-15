@@ -254,6 +254,12 @@
         else if (name === 'transcript') { if (value) setExchange(value, null); }
         else if (name === 'response') { if (value != null) setExchange(null, value); renderConversation(); }
         else if (name === 'state') { $('lx-state').textContent = value && value.label ? '[' + value.label + ']' : ''; }
+        else if (name === 'tts-error') {
+          const el = $('lx-state');
+          el.textContent = '[voice failed — text only: ' + value + ']';
+          el.style.color = '#ff6b6b';
+          setTimeout(() => { el.style.color = '#C6FF3D'; }, 8000);
+        }
         else if (name === 'miss-logged') { renderMissLog(); }
         else if (name === 'new-match') { renderConversation(); }
       };
