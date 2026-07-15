@@ -116,9 +116,11 @@ async function ask(state, q) {
 }
 
 (async () => {
+  const only = process.argv[2]; // optional substring filter: node cores/battery.js "one-way"
+  const list = only ? Q.filter(([, q]) => q.includes(only)) : Q;
   const rows = [];
   let n = 0;
-  for (const [state, q, expect] of Q) {
+  for (const [state, q, expect] of list) {
     n++;
     process.stdout.write('[' + n + '/' + Q.length + '] (' + state + ') ' + q + '\n');
     try {
@@ -142,6 +144,6 @@ async function ask(state, q) {
   }
   const over = rows.filter((r) => r.words > 40).length;
   md += '---\n' + rows.length + ' questions · ' + over + ' answers over 40 words\n';
-  fs.writeFileSync(path.join(__dirname, 'battery-report.md'), md);
+  fs.writeFileSync(path.join(__dirname, only ? 'battery-report-partial.md' : 'battery-report.md'), md);
   console.log('\nDONE. ' + rows.length + ' questions, ' + over + ' over 40 words. Report: cores/battery-report.md');
 })();
