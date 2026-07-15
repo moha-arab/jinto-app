@@ -20,7 +20,7 @@ You are the crosshair magnet, not the fragger. On attack you go in first so five
 
 ## Attack
 
-Start with their Operator: nothing in the game answers one as cleanly as an armed dash. The Op's weakness is the beat between shots, and your dash is faster than it. Show him something cheap, a shoulder or a jump-peek, and make him commit the shot, then dash across or at him while he rechambers: an Op needs well over a second between shots and your dash lands in under half of one. You don't need the kill; an Op that's been dashed at stops holding the angle honestly, and that hesitation is the sightline your team walks through. Never try it with dash un-armed.
+Start with their Operator: nothing in the game answers one as cleanly as an armed dash. The Op's weakness is the beat between shots, and your dash is faster than it. Show him something cheap, a shoulder or a jump-peek, and make him commit the shot, then dash across or at him while he's reloading the shot: an Op needs well over a second between shots and your dash lands in under half of one. You don't need the kill; an Op that's been dashed at stops holding the angle honestly, and that hesitation is the sightline your team walks through. Never try it with dash un-armed.
 
 Your buy is a rifle; an Operator on attack fights your job description. Pistol round you're still the entry: Ghost plus a Cloudburst, and respect the Classic: past 20 meters it's a coin flip, two-tap and strafe out. Won pistol: Bulldog if full armor fits, Stinger or Spectre if not.
 

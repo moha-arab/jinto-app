@@ -30,3 +30,4 @@ releases/
 # Raw screenshot staging (Mohammad's own in-game captures, before cropping/placing)
 img/overlay/_capture/
 battery-report.md
+battery-report-partial.md

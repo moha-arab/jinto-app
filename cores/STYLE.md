@@ -62,6 +62,8 @@ heard") — citing the patch that changed it is not.
   smokes for the round; yours costs thirty seconds of recharge."
 - **Jargon is fine, riddles aren't.** Callouts, "choke," "one-way," "refrag" — fine. A sentence
   whose meaning flips depending on how you parse it — rewrite.
+- **Player words, not book words.** If a years-long player wouldn't recognize the term, it's wrong
+  even when it's technically correct ("rechambering" → "reloading"). Write what people say in comms.
 - **No meta-tier claims about other agents.** "Pros play X and Y now" rots faster than any other
   fact type and coaches nothing (proof: a draft called Yoru/Neon the top duelists; weeks later
   Mohammad: "both are awful now"). The only meta claim allowed is the durable WHY about this

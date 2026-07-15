@@ -9,16 +9,20 @@ const path = require('path');
 const CORES_DIR = __dirname;
 const OUT_DIR = path.join(__dirname, '..', 'scripts', 'content', 'cores');
 
+// The allow-list IS the source of truth for what counts as a core — any other .md in this
+// folder (STYLE.md, battery reports, scratch notes) is ignored.
 const AGENT_NAMES = { jett: 'Jett', clove: 'Clove', sova: 'Sova', cypher: 'Cypher' };
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-const files = fs.readdirSync(CORES_DIR).filter((f) => f.endsWith('.md') && f !== 'STYLE.md');
+const files = fs.readdirSync(CORES_DIR)
+  .filter((f) => f.endsWith('.md'))
+  .filter((f) => Object.prototype.hasOwnProperty.call(AGENT_NAMES, path.basename(f, '.md')));
 let count = 0;
 
 for (const file of files) {
   const key = path.basename(file, '.md');
-  const agent = AGENT_NAMES[key] || (key.charAt(0).toUpperCase() + key.slice(1));
+  const agent = AGENT_NAMES[key];
   const raw = fs.readFileSync(path.join(CORES_DIR, file), 'utf8');
 
   // Pull the patch from the header stamp; strip the H1 and the stamp line from the knowledge
