@@ -6,6 +6,7 @@
 // become "gentle" and "A site" doesn't become "a sight". Plain terms, no weights, ~50 max.
 const JINTO_KEYTERMS = [
   'jinto',
+  'hey jinto',
   'A site', 'B site', 'C site',
   'spike', 'retake', 'post-plant', 'lineup', 'one-way', 'molly', 'ult', 'eco',
   'anchor', 'lurk', 'flank', 'trade', 'smokes', 'entry', 'peek', 'rotate',
