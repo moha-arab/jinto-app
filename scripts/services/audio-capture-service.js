@@ -67,6 +67,28 @@ class AudioCaptureService {
     console.log('[audio-capture] stopped');
   }
 
+  /**
+   * Stop and wait for the recorder to flush its final chunk (MediaRecorder delivers the tail
+   * of the audio asynchronously after stop). Required for batch transcription — without the
+   * flush, the last word of the question gets cut off.
+   */
+  async stopAndFlush(timeoutMs = 800) {
+    if (!this._active || !this.recorder) { this._cleanup(); return; }
+    const rec = this.recorder;
+    await new Promise((resolve) => {
+      let done = false;
+      const settle = () => { if (!done) { done = true; resolve(); } };
+      rec.onstop = settle;
+      setTimeout(settle, timeoutMs);
+      try {
+        if (rec.state !== 'inactive') rec.stop();
+        else settle();
+      } catch (_) { settle(); }
+    });
+    this._cleanup();
+    console.log('[audio-capture] stopped (flushed)');
+  }
+
   _cleanup() {
     if (this.stream) {
       this.stream.getTracks().forEach((t) => t.stop());

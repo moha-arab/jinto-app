@@ -25,7 +25,7 @@ class BackgroundController {
     window.jintoEventBus = this.eventBus; // exposed to other windows via getMainWindow()
 
     this.audio = new AudioCaptureService();
-    this.stt = null; // lazy — created per session
+    this._chunks = []; // recorded audio for the current PTT hold (batch STT)
     this.claude = null; // created once we have a key
     this.tts = null;    // created once we have a key (Cartesia, currently unused)
     this.player = new AudioPlayerService(44100);
@@ -179,20 +179,10 @@ class BackgroundController {
     this.eventBus.trigger('response', '');   // clear previous response
 
     try {
-      // Open Deepgram first so it's ready when audio chunks arrive
-      this.stt = new DeepgramService(window.JINTO_KEYS.DEEPGRAM);
-      this.stt.onInterim = (text) => {
-        this.eventBus.trigger('transcript', text);
-      };
-      this.stt.onError = (err) => {
-        console.error('[jinto/bg] stt error:', err);
-        this.eventBus.trigger('state', { key: 'idle', label: 'error' });
-      };
-      await this.stt.connect();
-
-      // Start mic capture and route chunks to Deepgram
+      // Batch STT: just record while the key is held; transcription happens once on release.
+      this._chunks = [];
       await this.audio.start(
-        (chunk) => this.stt && this.stt.sendChunk(chunk),
+        (chunk) => this._chunks.push(chunk),
         (err) => {
           console.error('[jinto/bg] mic error:', err);
           this.eventBus.trigger('state', { key: 'idle', label: 'mic error' });
@@ -212,22 +202,28 @@ class BackgroundController {
     this.eventBus.trigger('ptt', 'up');
     this.eventBus.trigger('state', { key: 'thinking', label: 'transcribing' });
 
-    // Stop mic immediately
-    this.audio.stop();
-
-    // Wait for final transcript
+    // Stop the mic and wait for the recorder to flush its final chunk, then transcribe the
+    // whole utterance in one shot (full-context batch beats word-by-word streaming).
     let finalText = '';
     try {
-      if (this.stt) {
-        finalText = await this.stt.finish(1500);
+      await this.audio.stopAndFlush();
+      const chunks = this._chunks || [];
+      this._chunks = [];
+      if (chunks.length) {
+        const blob = new Blob(chunks, { type: chunks[0].type || 'audio/webm' });
+        finalText = await new DeepgramService(window.JINTO_KEYS.DEEPGRAM).transcribe(blob);
       }
     } catch (err) {
-      console.error('[jinto/bg] finish error:', err);
-    } finally {
-      if (this.stt) {
-        this.stt.close();
-        this.stt = null;
-      }
+      console.error('[jinto/bg] transcription failed:', err);
+      this.eventBus.trigger('state', { key: 'idle', label: 'stt error' });
+      this.eventBus.trigger('response', '(transcription failed — try again)');
+      return;
+    }
+
+    // If the user already started a new question while we transcribed, drop this one.
+    if (this._pttDown) {
+      console.log('[jinto/bg] new PTT during transcription — dropping stale turn');
+      return;
     }
 
     console.log('[jinto/bg] final transcript:', finalText);
