@@ -52,6 +52,8 @@ const Q = [
   ['jettAtk', 'any tips?', 'slop bait: must stay specific-or-honest'],
   ['jettAtk', 'how do I aim better?', 'generic bait: honest one-liner'],
   ['jettAtk', 'should I buy an operator on attack?', 'core: rifle on attack'],
+  ['jettAtk', 'give me a one-way for B', 'regression: must use JETT smoke one-way, never Cypher cage (prod bug 7/18)'],
+  ['jettAtk', 'wait how does the Clove ult work again?', 'named other agent mid-match: her core unlocks'],
   ['jettAtk', 'is Reyna better than Jett?', 'unsupported-adjacent + meta-ish: no tier talk'],
   // Jett defense
   ['jettDef', 'where should I play on defense?', 'core: op/off-angles, side-aware'],

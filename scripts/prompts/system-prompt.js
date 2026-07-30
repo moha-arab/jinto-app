@@ -35,9 +35,38 @@ Side matters: attack and defense are different jobs — coach the side they are 
     stateBlock = `No game detected right now (main menu, lobby, or outside Valorant). You still coach: answer questions about yourself and about any agent you know.`;
   }
 
-  const knowledgeBlock = cores.length
-    ? cores.map((c) => `## ${c.agent} core — use ONLY when coaching ${c.agent} (patch ${c.patch})\n${c.knowledge.trim()}`).join('\n\n')
-    : '(No agent cores are loaded yet. Be honest about that — you can explain what jinto is, but you cannot coach any agent.)';
+  // Ability ownership — the hard vocabulary walls between kits. Update when cores are added.
+  const ownership = `ABILITY OWNERSHIP (hard walls — a word from one row may NEVER appear in another agent's answer):
+- Jett: Tailwind (dash), Cloudburst (smokes), Updraft, Blade Storm (knives)
+- Clove: Ruse (smokes), Not Dead Yet (ult), Pick-Me-Up (heal), Meddle (decay)
+- Sova: Recon Bolt (dart), Owl Drone, Shock Bolt, Hunter's Fury (ult)
+- Cypher: Trapwire (trips/wires), Cyber Cage, Spycam (cam), Neural Theft
+Example: "cage" exists ONLY in Cypher answers. A Jett or Clove one-way is made with THEIR smoke.`;
+
+  // In a match, the player's agent gets an ACTIVE core; everyone else's cores are locked away
+  // behind an explicit barrier — the model kept borrowing across kits when they sat side by side.
+  let knowledgeBlock;
+  if (!cores.length) {
+    knowledgeBlock = '(No agent cores are loaded yet. Be honest about that — you can explain what jinto is, but you cannot coach any agent.)';
+  } else {
+    const active = agent ? cores.find((c) => c.agent.toLowerCase() === agent.toLowerCase()) : null;
+    if (active) {
+      const others = cores.filter((c) => c !== active);
+      knowledgeBlock = `${ownership}
+
+## ACTIVE CORE — ${active.agent} (the player's agent; answer from THIS) (patch ${active.patch})
+${active.knowledge.trim()}
+
+# OTHER AGENTS' CORES — LOCKED
+Use a core below ONLY if the player names that agent in their question. For ${active.agent} questions these cores do not exist — never borrow their tools, spots, or vocabulary.
+
+${others.map((c) => `## ${c.agent} core (locked unless named) (patch ${c.patch})\n${c.knowledge.trim()}`).join('\n\n')}`;
+    } else {
+      knowledgeBlock = `${ownership}
+
+${cores.map((c) => `## ${c.agent} core — use ONLY when coaching ${c.agent} (patch ${c.patch})\n${c.knowledge.trim()}`).join('\n\n')}`;
+    }
+  }
 
   return `You are jinto, a Valorant coach who lives inside the player's game. You sound like a calm, confident, higher-ranked friend — direct, never waffling, never condescending. Agents you currently know deeply: ${supported}.
 
