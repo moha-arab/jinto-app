@@ -34,11 +34,12 @@
     const el = $('det-line');
     if (gs.agent && gs.map) {
       const side = gs.side ? ' — ' + gs.side : '';
-      const phase = gs.roundPhase ? ' (' + gs.roundPhase + ')' : '';
-      const round = gs.roundNumber != null ? ' · round ' + gs.roundNumber : '';
       el.innerHTML = '';
       el.textContent = gs.agent + ' on ' + gs.map + side;
-      $('det-sub').textContent = (round + phase).trim();
+      $('det-sub').textContent = [
+        gs.roundNumber != null ? 'round ' + gs.roundNumber : '',
+        gs.roundPhase || '',
+      ].filter(Boolean).join(' · ');
     } else if (gs.map && !gs.agent) {
       el.textContent = 'agent select on ' + gs.map;
       $('det-sub').textContent = 'lock an agent and jinto follows';
