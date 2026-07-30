@@ -2,6 +2,10 @@
 // Subscribes to Overwolf's Valorant GEP and maintains current game state in memory.
 // Other code (system prompt, refusal gate, overlay) reads from this.
 
+// Overwolf's Valorant team feature has been degraded/wrong (July 2026). While false, the
+// player's side stays "unknown" and observed raw values are logged for later verification.
+const TRUST_TEAM_FEED = false;
+
 class GameStateService {
   constructor(eventBus) {
     this.eventBus = eventBus;
@@ -124,10 +128,19 @@ class GameStateService {
         }
       }
       if (info.match_info.team != null) {
-        const side = this._cleanSide(info.match_info.team);
-        if (side !== this.state.side) {
-          this.state.side = side;
-          if (!side) console.log('[gep] unrecognized team value (dropped):', JSON.stringify(info.match_info.team));
+        // Overwolf's team feature is currently degraded AND has been observed WRONG in play
+        // (reported attack while on defense). Wrong side = wrong coaching, so side stays
+        // unknown until their feed is green and we've verified real values from these logs.
+        // Flip TRUST_TEAM_FEED at the top of this file once verified.
+        if (TRUST_TEAM_FEED) {
+          const side = this._cleanSide(info.match_info.team);
+          if (side !== this.state.side) this.state.side = side;
+        } else {
+          if (this._lastLoggedTeam !== info.match_info.team) {
+            console.log('[gep] team value observed (untrusted, not used):', JSON.stringify(info.match_info.team), 'at round', this.state.roundNumber);
+            this._lastLoggedTeam = info.match_info.team;
+          }
+          this.state.side = null;
         }
       }
       if (info.match_info.round_number != null) {
