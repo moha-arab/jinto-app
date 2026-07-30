@@ -77,6 +77,19 @@ class AudioPlayerService {
   }
 
   /**
+   * Tear down the AudioContext so the next play rebinds to the CURRENT default output
+   * device. Needed after headset plug/unplug — the old context keeps routing to the
+   * dead device and everything plays into the void.
+   */
+  reset() {
+    try { this.stopAll(); } catch (_) {}
+    if (this.ctx) { try { this.ctx.close(); } catch (_) {} }
+    this.ctx = null;
+    this.gain = null;
+    this.nextStartTime = 0;
+  }
+
+  /**
    * Stop all currently-playing audio immediately (for barge-in).
    */
   stopAll() {

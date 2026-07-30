@@ -168,26 +168,47 @@
       controller.setVolume(pct / 100);
     });
 
+    // Voice doctor: plays the sample AND reports what actually happened on the button —
+    // connection result, audio chunks received, audio engine state, volume. One glance
+    // tells us which layer a silence lives in.
     $('test-voice-btn').addEventListener('click', async () => {
+      const btn = $('test-voice-btn');
       const sample = "Hi, I'm jinto. Volume and voice are working.";
       const provider = controller.ttsProvider;
-      if (provider === 'cartesia' && controller.tts) {
-        try {
-          await controller.tts.connect();
-          // onAudioChunk is normally wired during a PTT answer; without this line the test
-          // utterance streams back and every chunk is silently dropped (button seems dead).
-          controller.tts.onAudioChunk = (b64) => controller.player.enqueueChunk(b64);
-          controller.tts.startContext();
-          controller.tts.sendText(sample, false);
-          controller.tts.finish();
-          setTimeout(() => controller.tts && controller.tts.close(), 6000);
-        } catch (err) {
-          console.error('[desktop] test voice failed', err);
-        }
-      } else if (provider === 'openai' && controller.openaiTts) {
-        controller.openaiTts.speak(sample);
-      } else if (provider === 'webspeech') {
-        controller.webSpeech.speak(sample);
+      const restore = (ms) => setTimeout(() => { btn.textContent = '▶ test voice'; }, ms);
+
+      if (provider === 'openai' && controller.openaiTts) { controller.openaiTts.speak(sample); return; }
+      if (provider === 'webspeech') { controller.webSpeech.speak(sample); return; }
+      if (!controller.tts) { btn.textContent = '✗ no tts service (key missing?)'; restore(8000); return; }
+
+      try {
+        btn.textContent = 'testing…';
+        // Rebind audio to the CURRENT output device (fixes headset-switch silence)
+        if (controller.player && controller.player.reset) controller.player.reset();
+
+        let chunks = 0;
+        let serverErr = null;
+        await controller.tts.connect();
+        controller.tts.onAudioChunk = (b64) => { chunks++; controller.player.enqueueChunk(b64); };
+        controller.tts.onError = (e) => { serverErr = String((e && e.message) || e); };
+        controller.tts.startContext();
+        controller.tts.sendText(sample, false);
+        controller.tts.finish();
+
+        await new Promise((r) => setTimeout(r, 4000));
+        const ctx = controller.player && controller.player.ctx;
+        const diag = 'chunks:' + chunks
+          + ' · audio:' + (ctx ? ctx.state : 'none')
+          + ' · vol:' + Math.round((controller.volume || 0) * 100) + '%'
+          + (serverErr ? ' · ERR: ' + serverErr.slice(0, 60) : '');
+        console.log('[voice-doctor]', diag);
+        btn.textContent = (chunks > 0 ? '✓ ' : '✗ ') + diag;
+        restore(15000);
+        setTimeout(() => controller.tts && controller.tts.close(), 6000);
+      } catch (err) {
+        btn.textContent = '✗ connect failed: ' + String((err && err.message) || err).slice(0, 50);
+        console.error('[voice-doctor] connect failed', err);
+        restore(15000);
       }
     });
   }
