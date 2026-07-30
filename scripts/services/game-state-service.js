@@ -123,7 +123,13 @@ class GameStateService {
           if (prevMap && cleanMap && prevMap !== cleanMap) this._newMatch('map change');
         }
       }
-      if (info.match_info.team != null) this.state.side = info.match_info.team;
+      if (info.match_info.team != null) {
+        const side = this._cleanSide(info.match_info.team);
+        if (side !== this.state.side) {
+          this.state.side = side;
+          if (!side) console.log('[gep] unrecognized team value (dropped):', JSON.stringify(info.match_info.team));
+        }
+      }
       if (info.match_info.round_number != null) {
         const rn = parseInt(info.match_info.round_number, 10);
         // Round counter fell back to 1 → new match (covers same-map-twice).
@@ -201,6 +207,17 @@ class GameStateService {
     if (codenames[name]) name = codenames[name];
 
     return name;
+  }
+
+  /**
+   * The team field must be a real side. The half-recovered feed has sent raw numbers here;
+   * showing those (or telling the AI "Side: 3") is worse than showing nothing.
+   */
+  _cleanSide(raw) {
+    const s = String(raw).toLowerCase();
+    if (s.includes('att')) return 'attack';
+    if (s.includes('def')) return 'defense';
+    return null;
   }
 
   /**
