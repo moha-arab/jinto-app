@@ -50,9 +50,25 @@ html, body {
 .inner { flex: 1 1 auto; padding: 11px 14px 13px; min-width: 0; }
 
 .hdr { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
-.dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(198, 255, 61, 0.4); transition: background 220ms ease, box-shadow 220ms ease, transform 220ms ease; }
-.brand-dot.pulse { background: #C6FF3D; box-shadow: 0 0 11px rgba(198, 255, 61, 0.75); animation: pulse 1s ease-in-out infinite; }
-@keyframes pulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.35);opacity:0.55;} }
+/* The jinto mark, live: three bars that breathe while listening and bounce while speaking. */
+.voice { display: inline-flex; align-items: center; gap: 3px; height: 16px; }
+.voice i { display: block; width: 4px; border-radius: 2px; background: rgba(198, 255, 61, 0.45); height: 5px; transition: height 220ms ease, background 220ms ease; transform-origin: center; }
+.voice i:nth-child(1) { height: 5px; }
+.voice i:nth-child(2) { height: 9px; }
+.voice i:nth-child(3) { height: 5px; }
+#jinto-card[data-state="listening"] .voice i { background: #C6FF3D; animation: breathe 1.2s ease-in-out infinite; }
+#jinto-card[data-state="listening"] .voice i:nth-child(2) { animation-delay: 0.15s; }
+#jinto-card[data-state="listening"] .voice i:nth-child(3) { animation-delay: 0.3s; }
+#jinto-card[data-state="thinking"] .voice i { background: rgba(198, 255, 61, 0.7); animation: think 1.4s ease-in-out infinite; }
+#jinto-card[data-state="thinking"] .voice i:nth-child(2) { animation-delay: 0.2s; }
+#jinto-card[data-state="thinking"] .voice i:nth-child(3) { animation-delay: 0.4s; }
+#jinto-card[data-state="speaking"] .voice i { background: #C6FF3D; box-shadow: 0 0 8px rgba(198, 255, 61, 0.55); animation: speak 0.55s ease-in-out infinite; }
+#jinto-card[data-state="speaking"] .voice i:nth-child(1) { animation-delay: 0s; }
+#jinto-card[data-state="speaking"] .voice i:nth-child(2) { animation-delay: 0.18s; }
+#jinto-card[data-state="speaking"] .voice i:nth-child(3) { animation-delay: 0.36s; }
+@keyframes breathe { 0%,100% { height: 5px; } 50% { height: 12px; } }
+@keyframes think   { 0%,100% { opacity: 0.35; } 50% { opacity: 1; } }
+@keyframes speak   { 0%,100% { height: 5px; } 50% { height: 16px; } }
 .wm { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: rgba(244, 241, 234, 0.92); }
 .status { margin-left: auto; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(244, 241, 234, 0.3); }
 

@@ -6,7 +6,6 @@
     card: null, statusText: null,
     transcriptRow: null, transcript: null,
     responseRow: null, response: null,
-    brandDot: null,
   };
 
   let cardHideTimer = null;
@@ -18,7 +17,6 @@
     els.transcript    = document.getElementById('transcript');
     els.responseRow   = document.getElementById('response-row');
     els.response      = document.getElementById('response');
-    els.brandDot      = document.querySelector('.brand-dot');
 
     hideCard();
     setState('idle', '');
@@ -59,9 +57,6 @@
         els.transcriptRow.classList.add('hidden');
         els.responseRow.classList.add('hidden');
         showCard();
-        els.brandDot.classList.add('pulse');
-      } else if (payload === 'up') {
-        els.brandDot.classList.remove('pulse');
       }
     }
 
@@ -88,6 +83,7 @@
   }
 
   function setState(key, label) {
+    if (els.card) els.card.dataset.state = key; // drives the voice bars animation
     if (els.statusText) {
       els.statusText.dataset.state = key;
       els.statusText.textContent = label || key;
