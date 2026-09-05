@@ -100,13 +100,9 @@
         gs.roundPhase || '',
       ].filter(Boolean).join(' · ');
     } else if (gs.map && !gs.agent) {
-      if (gs.roundPhase || gs.roundNumber != null) {
-        el.textContent = 'in a match on ' + gs.map + ' — agent not detected';
-        $('det-sub').textContent = "jinto will ask which agent you're on · PULL FRESH GAME STATE in debug can fix this";
-      } else {
-        el.textContent = 'agent select on ' + gs.map;
-        $('det-sub').textContent = 'lock an agent and jinto follows';
-      }
+      el.textContent = gs.map + ' — agent not detected';
+      const roundBit = [gs.roundNumber != null ? 'round ' + gs.roundNumber : '', gs.roundPhase || ''].filter(Boolean).join(' · ');
+      $('det-sub').textContent = (roundBit ? roundBit + ' · ' : '') + 'agent select, custom, or a detection gap — just tell jinto who you’re on';
     } else {
       el.innerHTML = '<span class="dim">no game detected</span>';
       $('det-sub').textContent = 'jinto still answers questions about the agents it knows';
@@ -326,6 +322,7 @@
       $('gep-raw').textContent = controller.gameState.lastRaw();
       const feats = controller.gameState.getSupportedFeatures();
       $('gep-features').textContent = feats.length ? feats.join(', ') : 'none reported';
+      if (controller.gameState.gepSummary) $('gep-seen').textContent = controller.gameState.gepSummary();
     }
     const p = controller.ttsProvider;
     $('tts-status').textContent = p === 'cartesia' ? 'Cartesia Sonic-3' : p === 'openai' ? 'OpenAI TTS' : 'Windows TTS';

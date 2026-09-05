@@ -88,6 +88,13 @@ class GameStateService {
     });
   }
 
+  gepSummary() {
+    if (!this._seen || !Object.keys(this._seen).length) return 'nothing received yet';
+    return Object.keys(this._seen)
+      .map((k) => k + '[' + Object.keys(this._seen[k]).join(' ') + ']')
+      .join(' · ');
+  }
+
   getSupportedFeatures() {
     return this._supportedFeatures || [];
   }
@@ -98,8 +105,18 @@ class GameStateService {
     let changed = false;
 
     // Record last raw update for debugging
-    this._lastRawUpdate = JSON.stringify(update.info).slice(0, 200);
+    this._lastRawUpdate = JSON.stringify(update.info).slice(0, 500);
     if (this.eventBus) this.eventBus.trigger('gep-raw', this._lastRawUpdate);
+
+    // Accumulate which fields GEP has EVER sent this session — the debug panel shows this,
+    // so "agent never arrived" vs "agent arrived but we dropped it" is one glance.
+    this._seen = this._seen || {};
+    for (const k of Object.keys(info)) {
+      this._seen[k] = this._seen[k] || {};
+      if (info[k] && typeof info[k] === 'object') {
+        for (const sk of Object.keys(info[k])) this._seen[k][sk] = true;
+      }
+    }
 
     if (info.me) {
       if (typeof info.me.agent === 'string') {

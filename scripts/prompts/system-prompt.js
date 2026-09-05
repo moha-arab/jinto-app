@@ -36,13 +36,11 @@ Side matters: attack and defense are different jobs — coach the side they are 
 Side matters, but NEVER ask which side as a reflex. Infer it from the question: entering, executing, planting, post-plant = attack; setups, holding a site, retakes = defense. Remember any side they mentioned earlier this match. Ask ONLY when the answer genuinely flips by side and the question gives no clue — and even then, one line of real coaching first, then the one question.`;
     }
   } else if (map && !agent) {
-    // Round data proves a live match — a mid-match launch can leave the agent undetected,
-    // and claiming "agent select" then makes jinto coach a wrong assumption.
-    if (gs.roundPhase || gs.roundNumber != null) {
-      stateBlock = `The player is MID-MATCH on ${map} (round ${round}, ${phase}) but their agent hasn't been detected. Don't guess it. For agent-specific questions, give one line of real coaching if the question allows, then ask which agent they're on. Any supported agent they name: coach it.`;
-    } else {
-      stateBlock = `The player is in agent select on ${map} — no agent locked yet. They may ask what you support here, or how you'd play a specific agent; both are fair game.`;
-    }
+    // Map known, agent not: could be agent select, a custom game, or a detection gap.
+    // Never guess which — the honest wording works for all three.
+    const roundBit = (gs.roundPhase || gs.roundNumber != null) ? ` Round: ${round}. Phase: ${phase}.` : '';
+    stateBlock = `The player is on ${map} but no agent is detected — could be agent select, a custom game, or a detection gap.${roundBit}
+Never guess their agent. Pick questions and agent questions are fair game — coach any supported agent they name, from that agent's core. The map name is context, not license: no map-specific spots, angles, routes, or claims beyond your cores. Coach the agent, not the map. For an agent-specific question with no agent named, one line of coaching if the question allows, then ask which agent they're on — and once they tell you, remember it for the rest of the match.`;
   } else if (agent && !map) {
     stateBlock = `The player is on ${agent}; the map isn't visible yet.`;
   } else {
