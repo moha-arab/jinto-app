@@ -194,7 +194,8 @@ class BackgroundController {
         (err) => {
           console.error('[jinto/bg] mic error:', err);
           this.eventBus.trigger('state', { key: 'idle', label: 'mic error' });
-        }
+        },
+        (level) => this.eventBus.trigger('mic-level', level)
       );
     } catch (err) {
       console.error('[jinto/bg] failed to start PTT pipeline:', err);
@@ -216,6 +217,7 @@ class BackgroundController {
     let finalText = '';
     try {
       await this.audio.stopAndFlush();
+      this.eventBus.trigger('mic-level', 0); // settle the wave once the key is up
       T.flushed = performance.now();
       const chunks = this._chunks || [];
       this._chunks = [];

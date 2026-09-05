@@ -11,10 +11,11 @@ class AudioCaptureService {
     this._active = false;
   }
 
-  async start(onChunk, onError) {
+  async start(onChunk, onError, onLevel) {
     if (this._active) return;
     this.onChunk = onChunk;
     this.onError = onError;
+    this.onLevel = onLevel; // (0..1) live mic loudness, for the reactive wave
 
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
@@ -45,6 +46,26 @@ class AudioCaptureService {
 
       this.recorder.start(100); // 100ms chunks
       this._active = true;
+
+      // Live mic-level meter off the SAME stream: lets the overlay wave react to real audio,
+      // so a flat wave while you talk means the mic (not jinto) is the problem.
+      try {
+        this._levelCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = this._levelCtx.createMediaStreamSource(this.stream);
+        const analyser = this._levelCtx.createAnalyser();
+        analyser.fftSize = 512;
+        src.connect(analyser);
+        const buf = new Uint8Array(analyser.fftSize);
+        this._levelTimer = setInterval(() => {
+          analyser.getByteTimeDomainData(buf);
+          let sum = 0;
+          for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v; }
+          const rms = Math.sqrt(sum / buf.length);
+          if (this.onLevel) this.onLevel(Math.max(0, Math.min(1, rms * 3.5)));
+        }, 50);
+      } catch (e) {
+        console.warn('[audio-capture] level meter unavailable', e);
+      }
       console.log('[audio-capture] started, mime=' + mime);
     } catch (err) {
       console.error('[audio-capture] getUserMedia failed:', err);
@@ -90,6 +111,8 @@ class AudioCaptureService {
   }
 
   _cleanup() {
+    if (this._levelTimer) { clearInterval(this._levelTimer); this._levelTimer = null; }
+    if (this._levelCtx) { try { this._levelCtx.close(); } catch (_) {} this._levelCtx = null; }
     if (this.stream) {
       this.stream.getTracks().forEach((t) => t.stop());
       this.stream = null;

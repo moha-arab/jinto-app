@@ -57,6 +57,8 @@ html, body {
 .voice i:nth-child(2) { height: 9px; }
 .voice i:nth-child(3) { height: 5px; }
 #jinto-card[data-state="listening"] .voice i { background: #C6FF3D; animation: breathe 1.2s ease-in-out infinite; }
+/* Reactive mic wave: real levels override the idle breathe animation. */
+#jinto-card[data-mic] .voice i { animation: none !important; transition: height 80ms linear; }
 #jinto-card[data-state="listening"] .voice i:nth-child(2) { animation-delay: 0.15s; }
 #jinto-card[data-state="listening"] .voice i:nth-child(3) { animation-delay: 0.3s; }
 #jinto-card[data-state="thinking"] .voice i { background: rgba(198, 255, 61, 0.7); animation: think 1.4s ease-in-out infinite; }

@@ -53,6 +53,7 @@
       if (payload === 'down') {
         clearCardHide();
         setState('listening', '');
+        resetMicBars();
         els.transcript.textContent = '';
         els.transcriptRow.classList.add('hidden');
         els.responseRow.classList.add('hidden');
@@ -77,13 +78,35 @@
       }
     }
 
+    if (name === 'mic-level') {
+      updateMicBars(payload);
+    }
+
     if (name === 'hide_overlay') {
       hideCard();
     }
   }
 
+  // Reactive wave: while listening, the three bars follow real mic loudness. Flat bars while
+  // you talk = the mic isn't reaching jinto. Clears back to the CSS animation otherwise.
+  const MIC_MULT = [0.72, 1, 0.82];
+  function updateMicBars(level) {
+    if (!els.card || els.card.dataset.state !== 'listening') return;
+    els.card.dataset.mic = '1';
+    const bars = els.card.querySelectorAll('.voice i');
+    bars.forEach((b, i) => { b.style.height = (3 + level * 15 * MIC_MULT[i]).toFixed(1) + 'px'; });
+  }
+  function resetMicBars() {
+    if (!els.card) return;
+    els.card.removeAttribute('data-mic');
+    els.card.querySelectorAll('.voice i').forEach((b) => { b.style.height = ''; });
+  }
+
   function setState(key, label) {
-    if (els.card) els.card.dataset.state = key; // drives the voice bars animation
+    if (els.card) {
+      els.card.dataset.state = key; // drives the voice bars animation
+      if (key !== 'listening') resetMicBars(); // hand thinking/speaking back to CSS
+    }
     if (els.statusText) {
       els.statusText.dataset.state = key;
       els.statusText.textContent = label || key;
