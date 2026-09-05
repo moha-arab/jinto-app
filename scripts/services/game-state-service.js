@@ -83,6 +83,9 @@ class GameStateService {
           } else {
             console.warn('[gep] getInfo returned no data', res);
           }
+          // Registered but the snapshot didn't carry the agent (loaded in while away from the
+          // app, missed the one-time lock event) — poll hard until it shows up.
+          if (!this.state.agent) this._startAgentRecovery();
         });
       } else {
         console.warn('[gep] setRequiredFeatures failed, retrying...', info);
@@ -208,13 +211,17 @@ class GameStateService {
   _startAgentRecovery() {
     if (this._agentRecoveryTimer) return;
     let tries = 0;
-    console.log('[gep] agent unknown with a map in view — polling getInfo until it appears');
-    this._agentRecoveryTimer = setInterval(() => {
-      if (this.state.agent || ++tries > 20) { this._stopAgentRecovery(); return; }
+    console.log('[gep] agent unknown — polling getInfo hard until it appears');
+    const poll = () => {
       overwolf.games.events.getInfo((res) => {
         if (res && res.success && res.res) this._handleInfoUpdate({ info: res.res });
       });
-    }, 15000);
+    };
+    poll(); // immediate, then every 2.5s up to ~2 min
+    this._agentRecoveryTimer = setInterval(() => {
+      if (this.state.agent || ++tries > 48) { this._stopAgentRecovery(); return; }
+      poll();
+    }, 2500);
   }
 
   _stopAgentRecovery() {
@@ -225,7 +232,14 @@ class GameStateService {
   }
 
   _handleEvent(events) {
-    // Discrete events — match_start, kill, death, spike_planted, etc. Not used directly.
+    // The reliable moment to catch a missed agent: a match/round actually starting.
+    const list = (events && events.events) || [];
+    for (const ev of list) {
+      const name = ev && ev.name;
+      if (name === 'match_start' || name === 'match_info' || name === 'round_start' || name === 'scoreboard') {
+        if (!this.state.agent) { console.log('[gep] ' + name + ' with no agent — recovering'); this._startAgentRecovery(); }
+      }
+    }
   }
 
   /** A new match started (map changed or round counter reset). Consumers: conversation auto-reset. */
