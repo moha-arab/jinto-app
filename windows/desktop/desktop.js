@@ -232,6 +232,29 @@
   }
 
   // ---- DEBUG ----
+  function renderLatency() {
+    const timings = (controller.getTimings && controller.getTimings()) || [];
+    if (!timings.length) return;
+    const t = timings[timings.length - 1];
+    const part = (label, v) => v == null ? null : label + ' ' + v;
+    $('lat-last').textContent = [
+      part('stt', (t.flush || 0) + (t.stt || 0)),
+      part('first token', t.llmFirst),
+      part('llm', t.llmTotal),
+      part('v2v', t.v2v),
+    ].filter(Boolean).join(' · ') + ' ms';
+    const v2vs = timings.map((x) => x.v2v).filter((v) => v != null).sort((a, b) => a - b);
+    if (v2vs.length) {
+      const p50 = v2vs[Math.floor((v2vs.length - 1) / 2)];
+      $('lat-p50').textContent = (p50 / 1000).toFixed(2) + 's over ' + v2vs.length + ' turn' + (v2vs.length === 1 ? '' : 's');
+    }
+    const u = t.usage;
+    if (u) {
+      const read = u.cache_read_input_tokens || 0, wrote = u.cache_creation_input_tokens || 0;
+      $('lat-cache').textContent = read ? 'HIT — read ' + read + ' tok' : (wrote ? 'MISS — wrote ' + wrote + ' tok' : 'uncached');
+    }
+  }
+
   function renderDebug() {
     const registered = controller.gameState && controller.gameState._registered;
     $('gep-status').textContent = registered ? 'registered ✓' : 'NOT REGISTERED';
@@ -246,6 +269,7 @@
 
   function initDebug() {
     renderDebug();
+    renderLatency();
     $('force-snapshot-btn').addEventListener('click', () => {
       try {
         overwolf.games.events.getInfo((res) => {
@@ -283,6 +307,7 @@
           setTimeout(() => { el.style.color = '#C6FF3D'; }, 8000);
         }
         else if (name === 'miss-logged') { renderMissLog(); }
+        else if (name === 'turn-timing') { renderLatency(); }
         else if (name === 'new-match') { renderConversation(); }
       };
       bg.jintoEventBus.addListener(busHandler);

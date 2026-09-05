@@ -51,7 +51,8 @@ class BackgroundController {
     ];
 
     this.conversation = []; // {role, content} pairs, capped at 20
-    this._convEpoch = 0;    // bumped on every reset so an in-flight answer can't write into a fresh conversation
+    this._convEpoch = 0;
+    this._timings = []; // per-turn latency breakdowns (cap 50)    // bumped on every reset so an in-flight answer can't write into a fresh conversation
 
     this._pttDown = false;
 
@@ -198,6 +199,7 @@ class BackgroundController {
   async _handlePTTUp() {
     if (!this._pttDown) return;
     this._pttDown = false;
+    const T = { release: performance.now() }; // latency marks; everything is measured from PTT release
 
     this.eventBus.trigger('ptt', 'up');
     this.eventBus.trigger('state', { key: 'thinking', label: 'transcribing' });
@@ -207,6 +209,7 @@ class BackgroundController {
     let finalText = '';
     try {
       await this.audio.stopAndFlush();
+      T.flushed = performance.now();
       const chunks = this._chunks || [];
       this._chunks = [];
       if (chunks.length) {
@@ -226,6 +229,7 @@ class BackgroundController {
       return;
     }
 
+    T.stt = performance.now();
     console.log('[jinto/bg] final transcript:', finalText);
     this.eventBus.trigger('transcript', finalText);
 
@@ -267,7 +271,10 @@ class BackgroundController {
       if (this.ttsProvider !== 'cartesia' || !this.tts) return;
       try {
         await this.tts.connect();
-        this.tts.onAudioChunk = (b64) => this.player.enqueueChunk(b64);
+        this.tts.onAudioChunk = (b64) => {
+          if (!T.firstAudio) { T.firstAudio = performance.now(); this._updateTimingFirstAudio(T); }
+          this.player.enqueueChunk(b64);
+        };
         this.tts.onError = (err) => {
           console.error('[jinto/bg] cartesia error', err);
           this.eventBus.trigger('tts-error', String((err && err.message) || err));
@@ -301,12 +308,23 @@ class BackgroundController {
       cartesiaBuffer = cartesiaBuffer.slice(lastIdx);
     };
 
+    // Two system blocks: the stable one (persona + all cores + rules) carries the cache
+    // breakpoint so rounds/sides changing never bust the ~26k-token prefix; game state rides
+    // after it uncached. Cache TTL is 5 min — consecutive questions in a match all hit.
+    const promptParts = buildSystemPromptParts(this.gameState.snapshot());
+    const systemBlocks = [
+      { type: 'text', text: promptParts.stable, cache_control: { type: 'ephemeral' } },
+      { type: 'text', text: promptParts.volatile },
+    ];
+
     try {
+      T.llmStart = performance.now();
       const full = await this.claude.stream(
         this.conversation,
-        buildSystemPrompt(this.gameState.snapshot()),
+        systemBlocks,
         (chunk, accumulated) => {
           if (firstDelta) {
+            T.llmFirst = performance.now();
             this.eventBus.trigger('state', { key: 'speaking', label: 'answering' });
             firstDelta = false;
           }
@@ -322,6 +340,9 @@ class BackgroundController {
         JINTO_TOOLS,
         (toolName, input) => this._handleToolCall(toolName, input)
       );
+
+      T.llmDone = performance.now();
+      this._recordTiming(T);
 
       if (convEpoch === this._convEpoch) {
         this.conversation.push({ role: 'assistant', content: full });
@@ -401,6 +422,42 @@ class BackgroundController {
   }
 
   /** The miss log, newest first. */
+  // ---- latency instrumentation ----
+  _recordTiming(T) {
+    const ms = (a, b) => (a != null && b != null) ? Math.round(a - b) : null;
+    const entry = {
+      at: Date.now(),
+      flush: ms(T.flushed, T.release),
+      stt: ms(T.stt, T.flushed),
+      llmFirst: ms(T.llmFirst, T.llmStart),
+      llmTotal: ms(T.llmDone, T.llmStart),
+      v2v: ms(T.firstAudio, T.release), // voice-to-voice: PTT release -> first audio chunk
+      usage: this.claude ? this.claude.lastUsage : null,
+    };
+    T._entry = entry;
+    this._timings.push(entry);
+    if (this._timings.length > 50) this._timings = this._timings.slice(-50);
+    const u = entry.usage || {};
+    console.log('[jinto/bg] turn timing: flush ' + entry.flush + ' · stt ' + entry.stt +
+      ' · first token ' + entry.llmFirst + ' · llm total ' + entry.llmTotal +
+      ' · voice-to-voice ' + entry.v2v + 'ms · cache read ' + (u.cache_read_input_tokens || 0) +
+      ' / wrote ' + (u.cache_creation_input_tokens || 0));
+    this.eventBus.trigger('turn-timing', entry);
+  }
+
+  // First audio can land after the LLM stream finishes (TTS still speaking) — patch the
+  // already-recorded entry and re-emit so the dashboard shows the real voice-to-voice number.
+  _updateTimingFirstAudio(T) {
+    if (T._entry && T._entry.v2v == null && T.firstAudio != null) {
+      T._entry.v2v = Math.round(T.firstAudio - T.release);
+      this.eventBus.trigger('turn-timing', T._entry);
+    }
+  }
+
+  getTimings() {
+    return this._timings.slice();
+  }
+
   getMissLog() {
     try {
       return JSON.parse(localStorage.getItem('jinto-miss-log') || '[]');

@@ -10,6 +10,7 @@ class ClaudeService {
     this.model = 'claude-sonnet-4-6';
     this.maxTokens = 400;
     this._abortController = null;
+    this.lastUsage = null; // usage from the most recent stream (incl. cache stats)
   }
 
   /**
@@ -23,6 +24,7 @@ class ClaudeService {
    */
   async stream(messages, systemPrompt, onDelta, tools, onToolCall) {
     this._abortController = new AbortController();
+    this.lastUsage = null;
     const body = {
       model: this.model,
       max_tokens: this.maxTokens,
@@ -82,7 +84,11 @@ class ClaudeService {
           let data;
           try { data = JSON.parse(dataStr); } catch (_) { continue; }
 
-          if (data.type === 'content_block_start') {
+          if (data.type === 'message_start') {
+            this.lastUsage = (data.message && data.message.usage) || null;
+          } else if (data.type === 'message_delta' && data.usage) {
+            this.lastUsage = Object.assign(this.lastUsage || {}, data.usage);
+          } else if (data.type === 'content_block_start') {
             const cb = data.content_block || {};
             blocks[data.index] = { type: cb.type, name: cb.name, jsonBuf: '' };
           } else if (data.type === 'content_block_delta') {

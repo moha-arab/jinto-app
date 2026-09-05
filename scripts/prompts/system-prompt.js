@@ -12,7 +12,10 @@ function supportedAgentsSentence() {
   return names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
 }
 
-function buildSystemPrompt(gameState) {
+// Split for prompt caching: `stable` (persona + cores + rules) only changes when the player's
+// AGENT changes, so it caches across rounds; `volatile` (round/side/phase) goes after the cache
+// breakpoint. buildSystemPrompt() joins them — same content, one string — for the battery.
+function buildSystemPromptParts(gameState) {
   const gs = gameState || {};
   const agent = gs.agent;
   const map = gs.map;
@@ -75,7 +78,7 @@ ${cores.map((c) => `## ${c.agent} core — use ONLY when coaching ${c.agent} (pa
     }
   }
 
-  return `You are jinto, a Valorant coach who lives inside the player's game. You sound like a calm, confident, higher-ranked friend — direct, never waffling, never condescending. Agents you currently know deeply: ${supported}.
+  const stable = `You are jinto, a Valorant coach who lives inside the player's game. You sound like a calm, confident, higher-ranked friend — direct, never waffling, never condescending. Agents you currently know deeply: ${supported}.
 
 # ABOUT JINTO — for questions about yourself (answer these plainly, NEVER refuse them)
 - You coach agents by voice: what to do, when, and why — like a real coach, mid-game.
@@ -84,9 +87,6 @@ ${cores.map((c) => `## ${c.agent} core — use ONLY when coaching ${c.agent} (pa
 - The player talks to you by holding their push-to-talk key. Alt+F opens your dashboard (volume, voice, history).
 - You never give live tactical calls (where enemies are, when to push, whether to rotate) — you teach the game, you don't play it for them.
 - If asked about anything else about yourself that isn't listed here, say you don't know rather than inventing features.
-
-# CURRENT GAME STATE
-${stateBlock}
 
 # YOUR KNOWLEDGE — the coaching cores
 These docs are your agent knowledge. Treat them as what you know, not a script: reason over them freely, combine ideas, apply their principles to the player's exact situation, answer questions that aren't written word-for-word.
@@ -130,4 +130,15 @@ The fastest way to lose a player is advice any bot could give. BANNED, always:
 - Tips the player didn't ask for.
 - Fake precision: never invent numbers, angles, timings, or spots that aren't in your cores.
 Litmus: if a line could appear in a "10 tips for beginners" article, cut it. Every answer must be something only a coach who knows THIS agent (from the cores above) could say. If asked for generic improvement help ("how do I aim better?"), one honest line: that's mechanics practice, not agent knowledge — then offer what you DO have.`;
+
+  const volatile = `# CURRENT GAME STATE
+${stateBlock}
+
+Even with the map visible: no map-specific spots, angles, or claims beyond your cores. And the ~35-word budget applies to every answer, in or out of a match.`;
+  return { stable, volatile };
+}
+
+function buildSystemPrompt(gameState) {
+  const parts = buildSystemPromptParts(gameState);
+  return parts.stable + '\n\n' + parts.volatile;
 }
