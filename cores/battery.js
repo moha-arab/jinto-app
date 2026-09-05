@@ -13,6 +13,13 @@ load('scripts/content/cores/jett.js');
 load('scripts/content/cores/clove.js');
 load('scripts/content/cores/sova.js');
 load('scripts/content/cores/cypher.js');
+load('scripts/content/cores/reyna.js');
+load('scripts/content/cores/raze.js');
+load('scripts/content/cores/omen.js');
+load('scripts/content/cores/sage.js');
+load('scripts/content/cores/phoenix.js');
+load('scripts/content/cores/chamber.js');
+load('scripts/content/cores/killjoy.js');
 load('scripts/content/index.js');
 load('scripts/prompts/system-prompt.js');
 
@@ -38,6 +45,13 @@ const STATES = {
   sovaAtk:   { agent: 'Sova',   map: 'Haven',  side: 'attack',  roundNumber: 5,  roundPhase: 'shopping' },
   cypherDef: { agent: 'Cypher', map: 'Pearl',  side: 'defense', roundNumber: 1,  roundPhase: 'shopping' },
   cypherAtk: { agent: 'Cypher', map: 'Pearl',  side: 'attack',  roundNumber: 13, roundPhase: 'shopping' },
+  reynaAtk:  { agent: 'Reyna',  map: 'Bind',   side: 'attack',  roundNumber: 4,  roundPhase: 'shopping' },
+  razeAtk:   { agent: 'Raze',   map: 'Split',  side: 'attack',  roundNumber: 6,  roundPhase: 'shopping' },
+  omenDef:   { agent: 'Omen',   map: 'Ascent', side: 'defense', roundNumber: 2,  roundPhase: 'shopping' },
+  sageDef:   { agent: 'Sage',   map: 'Icebox', side: 'defense', roundNumber: 8,  roundPhase: 'shopping' },
+  phoenixAtk:{ agent: 'Phoenix',map: 'Haven',  side: 'attack',  roundNumber: 3,  roundPhase: 'shopping' },
+  chamberDef:{ agent: 'Chamber',map: 'Lotus',  side: 'defense', roundNumber: 1,  roundPhase: 'shopping' },
+  killjoyDef:{ agent: 'Killjoy',map: 'Sunset', side: 'defense', roundNumber: 5,  roundPhase: 'shopping' },
   select:    { agent: null,     map: 'Ascent' },
   noGame:    {},
 };
@@ -77,10 +91,33 @@ const Q = [
   ['cypherDef', 'someone keeps breaking my wires, what do I do?', 'derivable from vary-the-web'],
   ['cypherAtk', 'when should I lurk?', 'core: legal start time'],
   ['cypherAtk', 'where exactly do I put my trips on this map?', 'map-specific: principle + log_miss'],
+  // Wave 2 cores
+  ['reynaAtk', 'after I get a kill should I heal or dismiss?', 'core: the orb decision'],
+  ['reynaAtk', 'my leer keeps getting shot instantly, what am I doing wrong?', 'core: placement + doorbell info read'],
+  ['reynaAtk', 'should I take the first fight every round?', 'core: yes — the job, with the deal explained'],
+  ['razeAtk', 'how do I take space with my satchels?', 'core: movement/entry rules'],
+  ['razeAtk', 'when should I use my rocket?', 'core: Showstopper timing'],
+  ['razeAtk', 'give me a one-way for A site', 'regression: Raze has NO smoke — honest answer, never a borrowed tool'],
+  ['omenDef', 'give me a one-way for B site', 'regression: OMEN smoke one-way from his core, never Cypher cage'],
+  ['omenDef', 'when should I use my teleport?', 'core: Shrouded Step rules'],
+  ['omenDef', 'should I smoke at the start of every round?', 'core: smoke economy'],
+  ['sageDef', 'where should I put my wall?', 'map-specific bait: principle + log_miss'],
+  ['sageDef', 'when should I res?', 'core: res conditions'],
+  ['sageDef', 'do I heal myself or my teammate first?', 'core/derivable'],
+  ['phoenixAtk', 'how do I flash without blinding my team?', 'core: Curveball mechanics'],
+  ['phoenixAtk', 'can I heal off my wall?', 'core: Heating Up'],
+  ['phoenixAtk', 'when do I ult?', 'core: Run It Back conditions'],
+  ['chamberDef', 'where should I put my teleport?', 'core: anchor-before-peek principle, no invented map spots'],
+  ['chamberDef', 'is headhunter worth buying every round?', 'core: bullet math'],
+  ['chamberDef', 'someone keeps shooting my trap, what do I do?', 'derivable: deep placement'],
+  ['killjoyDef', 'how should I set up my site?', 'core: principles, no map specifics invented'],
+  ['killjoyDef', 'when do I use lockdown?', 'core: on a commit, not a guess'],
+  ['killjoyDef', 'can I leave my setup and push with my team?', 'core: leash rules'],
   // Agent select
-  ['select', 'what agents do you support?', 'self: list four, no refusal'],
+  ['select', 'what agents do you support?', 'self: list all eleven, no refusal'],
   ['select', 'how should I play Jett here?', 'unlocked coaching from core'],
-  ['select', 'should I pick Omen?', 'unsupported: honest redirect + log_miss'],
+  ['select', 'should I pick Omen?', 'NOW SUPPORTED: coach from his core, no redirect'],
+  ['select', 'should I pick Viper?', 'unsupported: honest redirect + log_miss'],
   // No game
   ['noGame', 'what can you do?', 'self-facts'],
   ['noGame', 'tell me about Clove', 'desktop coaching'],

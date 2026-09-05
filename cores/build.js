@@ -11,7 +11,11 @@ const OUT_DIR = path.join(__dirname, '..', 'scripts', 'content', 'cores');
 
 // The allow-list IS the source of truth for what counts as a core — any other .md in this
 // folder (STYLE.md, battery reports, scratch notes) is ignored.
-const AGENT_NAMES = { jett: 'Jett', clove: 'Clove', sova: 'Sova', cypher: 'Cypher' };
+const AGENT_NAMES = {
+  jett: 'Jett', clove: 'Clove', sova: 'Sova', cypher: 'Cypher',
+  reyna: 'Reyna', raze: 'Raze', omen: 'Omen', sage: 'Sage',
+  phoenix: 'Phoenix', chamber: 'Chamber', killjoy: 'Killjoy',
+};
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 

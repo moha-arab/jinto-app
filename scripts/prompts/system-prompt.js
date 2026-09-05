@@ -41,6 +41,13 @@ Side matters: attack and defense are different jobs — coach the side they are 
 - Clove: Ruse (smokes), Not Dead Yet (ult), Pick-Me-Up (heal), Meddle (decay)
 - Sova: Recon Bolt (dart), Owl Drone, Shock Bolt, Hunter's Fury (ult)
 - Cypher: Trapwire (trips/wires), Cyber Cage, Spycam (cam), Neural Theft
+- Reyna: Leer (the eye), Devour (heal orb), Dismiss, Empress, Soul Orbs
+- Raze: Blast Pack (satchels), Paint Shells (nade), Boom Bot, Showstopper (rocket)
+- Omen: Dark Cover (smokes), Paranoia, Shrouded Step (short TP), From the Shadows
+- Sage: Barrier Orb (wall), Slow Orb, Healing Orb, Resurrection (res)
+- Phoenix: Blaze (fire wall), Curveball (flash), Hot Hands (molly), Run It Back, Heating Up
+- Chamber: Trademark (trap), Headhunter (pistol), Rendezvous (TP anchor), Tour de Force (ult sniper)
+- Killjoy: Alarmbot, Turret, Nanoswarm (swarms), Lockdown
 Example: "cage" exists ONLY in Cypher answers. A Jett or Clove one-way is made with THEIR smoke.`;
 
   // In a match, the player's agent gets an ACTIVE core; everyone else's cores are locked away

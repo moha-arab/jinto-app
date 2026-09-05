@@ -1,0 +1,60 @@
+# Omen — core
+
+*(written against patch 13.05, September 2026. The kit is the shape you remember; the numbers aren't. The blind is shorter in reach and time, the smokes regrow slower, and everyone hears your teleports now.)*
+
+## Who you are on the team
+
+You're the smoke supply, and the smokes are the product; the blind and the teleports are personal tools bolted onto that job. Two things separate you from every other controller: you place smokes through the map view without seeing the spot, so you never have to stand near the thing you're smoking, and your smokes regrow, roughly a fresh charge every forty seconds you're alive. That second fact is your win condition in one sentence: a living Omen never runs out of smokes, and a dead Omen produces nothing for the rest of the round. The off-angles, the fakes, the flank ult: all of it is allowed only while the smoke job is covered.
+
+## The kit, for real
+
+**Dark Cover** is why you're on the team. One charge comes back free every round and the second is cheap; start every round holding two, topped up before you spend a credit on anything else. You place it from most of the way across the map with no line of sight, which means the smoke and your body are separate decisions: smoke the site from a flank, smoke the other site to sell a fake, smoke a retake you're not part of. The sphere lasts 15 seconds and it's hollow, so sitting inside your own smoke you see anyone who walks in at point-blank while they see nothing until they're on top of you. It also announces its own death: a cue plays about a second and a half before it fades, audible to both sides, so time your re-peek off it and expect theirs. Because charges regrow, smokes are not precious. Spending them mid-round on map control or flank cover is correct; the discipline is having one charge banked or growing when the round-deciding moment arrives, the post-plant or the retake.
+
+**Paranoia** is a team ability that happens to come out of your hands. It fires straight from your chest, travels through walls, and blinds and deafens everyone it touches, teammates and yourself included, so it gets called before it gets thrown. The blind lasts two seconds. That is not "they're helpless," that is one swing's worth of time, and blinded players still see about seven meters, so the man you just blinded kills you fine at point-blank. It also runs out at about 25 meters and takes over a second to get there, so blind the choke you're near, not the site across the map; deep blinds from the back of the lobby die before they reach anyone who matters. And it's slow in the draw. Equip it before the push starts; pulling it reactively mid-fight is how you die holding a purple ball.
+
+**Shrouded Step** is fifteen meters of repositioning with a tax at both ends. Casting is loud where you stand, arriving is loud where you land, and the windup leaves you standing still and unable to shoot, so anyone watching your landing spot gets a free kill on arrival. Never teleport forward into space nobody's cleared. What it's actually for: high ground and boxes only a teleporter reaches, and escapes, taking an aggressive fight and leaving before the trade arrives. The combos come from your own kit: smoke a spot and step behind the smoke, or blind them and take the teleport while they can't see or hear it. Casting to fake a rotation still has occasional value, but enemies read the sound well now; budget the cast as a real reposition or don't press it.
+
+**From the Shadows** is a bad seven points if you spend it on fights and a great seven if you spend it on the map. You pick a spot anywhere, wind up, and a shade of you stands at the destination for a few seconds before you arrive. One bullet into that shade cancels the trip and sends you back where you started, and you can cancel it yourself mid-ride; treat the points as spent the moment you press the button either way, and never send it toward people who are alert and watching. While it runs, every enemy's minimap goes dark; they know an Omen ult is live but their map won't say from where. You arrive nearly blind, vision fading in over the ride, holding whatever was in your hands when you left, so re-equip your gun and don't plan on winning a fight in the first seconds after landing. The habit worth stealing: smoke your own destination first, so the shade materializes inside your smoke where nobody can shoot it and your eyes come back in cover. Spend it on map state: the flank behind a defense committed to the push, position for a retake, the dropped spike lying somewhere your team can't walk to.
+
+## Attack
+
+You're the second man out, not the first. The entry takes the space; you make the space takeable. Smoke the sightlines defenders actually shoot the entry from, and smoke them when the team is at the choke ready to move, not while people are still deciding. A smoke thrown during the debate expires exactly as they finally walk in, and now the hit is dry with your name on it. Fifteen seconds is a full execute if it starts on the execute. If an initiator scans the site first, place off what the scan finds, not off habit.
+
+The Paranoia play on a hit is mechanical: pre-equipped, called, thrown through the wall of the choke as the first man swings, so the defenders holding the entry spend the entry window blind and deaf while your duelist swings a man who can't see past seven meters. Stand closer to the choke than feels comfortable; the reach is shorter than it looks.
+
+Because your smokes don't care where you stand, you have a second mode: support from somewhere else. Smoke the site from mid while holding the flank, or smoke the far site to sell a fake while the real hit goes in. That's a tool, not an identity. An Omen who lurks every round while four teammates hit an unsmoked site isn't lurking, he's throwing with a route.
+
+Post-plant is where you're quietly elite. Step to the off-angle or high ground retakers won't pre-aim, and keep a smoke banked: the smoke dropped on the defuser, or the one that cuts the retake path in half, wins more post-plants than your gun does. The ult, if it's up, puts you behind the retake instead of in front of it.
+
+## Defense
+
+The job is making five attackers take the site slowly and arrive late. Don't smoke the choke at round start on a guess; that smoke is gone before the rush that actually comes. Hold the charges, listen, smoke the choke as they commit into it, then put Paranoia through the wall into the stack while you stand somewhere they can't punish. You can break an execute's timing from behind cover, and the smoke you spent is already growing back.
+
+One-ways are yours more than anyone's, because the map view lets you set the smoke's bottom edge exactly on a ledge or doorframe, so they walk in showing legs while seeing nothing. Build a couple you trust; they turn a choke into a toll booth.
+
+The aggression pattern that separates good Omens: take an early fight from somewhere only a teleporter reaches, then step out the moment it warms up. The catch is sound. Both ends of the teleport are loud, so the escape is fast, not invisible, and a spot they've heard you leave once is a spot they pre-aim next round. Rotate it every round or two.
+
+On retakes you're the setup, not the entry: smoke to cut the planted site in half, blind the angle your team swings, and if you ult, land behind the attackers' map control while they're busy holding the site, never in front of the three of them watching the door.
+
+## Decisions that win or lose rounds
+
+- **Smoke on the execute, not on a schedule.** The single biggest Omen error at every rank. Fifteen seconds starts when you throw, not when your team is ready.
+- **Burn the regen, bank one.** Mid-round smokes are free over a long round; walking into a post-plant with zero charges and none growing costs everything.
+- **Smoke their eyes, not yours.** A smoke that covers your team's approach but leaves their sightline open is cover for them, and a shallow smoke short of the choke is a bush you built for the attackers to stand in.
+- **Paranoia is a contract.** You call it, you throw it through cover, somebody swings inside the two seconds. No swinger, no throw; 250 credits deserves a plan. And never in someone's face, where shooting is simply faster.
+- **Teleport geometry.** Both ends are loud and the windup is a free kill for anyone watching the landing. Step up, step out, step behind your own smoke. Never step forward into space nobody's cleared.
+- **Ult the map, not the fight.** Flank, retake position, spike pickup. If alert enemies can see the arrival point and it isn't smoked, the answer is no.
+- **Stay alive like it's an ability.** Your death doesn't cost the team one player, it costs every smoke for the rest of the round.
+
+## Mistakes that actually cost rounds
+
+Ranked by rounds burned:
+
+1. **Scheduled smokes.** Thrown early and expired mid-hit, or the same two placements every round until they pre-fire the gaps.
+2. **Dying with the team's smokes in your pocket.** Peeking for picks like a duelist while four people wait on utility only you produce.
+3. **The permanent lurk.** Cross-map smoking makes lurking possible, not mandatory, and an uncalled lurk is worse than none.
+4. **Ulting at people.** A shade sent toward alert enemies eats one bullet and the trip is over; you paid the seven points the moment you pressed. Coinflip re-peek ults and panic-escape ults are the same mistake in different clothes.
+5. **Predictable teleports.** The same off-angle three rounds running, or a blind step forward. Everyone near either end heard it.
+6. **Solo Paranoias.** Nobody swings, the two seconds pass, 250 credits of nothing. The uglier cousin: blinding your own entry mid-push because you didn't call it.
+7. **Smokes for the enemy.** Shallow ones they hide in, deep ones that cut your own team's swing.
+8. **Fumbled hands.** Arriving from the ult with knife out, or drawing Paranoia in someone's face and dying during the pull. The kit is slow in the draw; equip early.
