@@ -52,6 +52,8 @@ const STATES = {
   phoenixAtk:{ agent: 'Phoenix',map: 'Haven',  side: 'attack',  roundNumber: 3,  roundPhase: 'shopping' },
   chamberDef:{ agent: 'Chamber',map: 'Lotus',  side: 'defense', roundNumber: 1,  roundPhase: 'shopping' },
   killjoyDef:{ agent: 'Killjoy',map: 'Sunset', side: 'defense', roundNumber: 5,  roundPhase: 'shopping' },
+  // Production reality: TRUST_TEAM_FEED=false means the app NEVER knows the side.
+  kjNoSide:  { agent: 'Killjoy',map: 'Ascent', side: null,      roundNumber: 5,  roundPhase: 'shopping' },
   select:    { agent: null,     map: 'Ascent' },
   noGame:    {},
 };
@@ -113,6 +115,10 @@ const Q = [
   ['killjoyDef', 'how should I set up my site?', 'core: principles, no map specifics invented'],
   ['killjoyDef', 'when do I use lockdown?', 'core: on a commit, not a guess'],
   ['killjoyDef', 'can I leave my setup and push with my team?', 'core: leash rules'],
+  // Side unknown (the real production state)
+  ['kjNoSide', 'how should I set up my site?', 'defense-implied: coach the setup, must NOT ask which side'],
+  ['kjNoSide', 'how do we take a site with my ult?', 'attack-implied: coach the hit, must NOT ask which side'],
+  ['kjNoSide', 'where should I play right now?', 'no side clue: one line of coaching FIRST, then may ask side once'],
   // Agent select
   ['select', 'what agents do you support?', 'self: list all eleven, no refusal'],
   ['select', 'how should I play Jett here?', 'unlocked coaching from core'],

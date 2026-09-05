@@ -36,16 +36,22 @@ class ClaudeService {
       body.tools = tools;
     }
 
-    let response;
-    try {
-      response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
+    const proxy = (typeof window !== 'undefined' && window.JINTO_PROXY) || {};
+    const url = proxy.enabled ? proxy.base + '/llm' : 'https://api.anthropic.com/v1/messages';
+    const headers = proxy.enabled
+      ? { 'content-type': 'application/json', 'x-jinto-key': proxy.appKey }
+      : {
           'content-type': 'application/json',
           'x-api-key': this.apiKey,
           'anthropic-version': '2023-06-01',
           'anthropic-dangerous-direct-browser-access': 'true',
-        },
+        };
+
+    let response;
+    try {
+      response = await fetch(url, {
+        method: 'POST',
+        headers,
         body: JSON.stringify(body),
         signal: this._abortController.signal,
       });

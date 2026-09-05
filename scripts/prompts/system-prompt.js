@@ -28,8 +28,13 @@ function buildSystemPromptParts(gameState) {
 
   let stateBlock;
   if (agent && map) {
-    stateBlock = `The player is playing ${agent} on ${map}. Side: ${side}. Round: ${round}. Phase: ${phase}.
+    if (gs.side) {
+      stateBlock = `The player is playing ${agent} on ${map}. Side: ${side}. Round: ${round}. Phase: ${phase}.
 Side matters: attack and defense are different jobs — coach the side they are on unless they ask about the other.`;
+    } else {
+      stateBlock = `The player is playing ${agent} on ${map}. Round: ${round}. Phase: ${phase}. Side: not detected (side detection is off).
+Side matters, but NEVER ask which side as a reflex. Infer it from the question: entering, executing, planting, post-plant = attack; setups, holding a site, retakes = defense. Remember any side they mentioned earlier this match. Ask ONLY when the answer genuinely flips by side and the question gives no clue — and even then, one line of real coaching first, then the one question.`;
+    }
   } else if (map && !agent) {
     // Round data proves a live match — a mid-match launch can leave the agent undetected,
     // and claiming "agent select" then makes jinto coach a wrong assumption.

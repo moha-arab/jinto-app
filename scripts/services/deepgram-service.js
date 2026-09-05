@@ -41,15 +41,20 @@ class DeepgramService {
     // keyterm must repeat per term (no comma lists per Deepgram docs)
     for (const term of JINTO_KEYTERMS) params.append('keyterm', term);
 
+    const proxy = (typeof window !== 'undefined' && window.JINTO_PROXY) || {};
+    const url = proxy.enabled
+      ? proxy.base + '/stt?' + params.toString()
+      : 'https://api.deepgram.com/v1/listen?' + params.toString();
+    const headers = proxy.enabled
+      ? { 'x-jinto-key': proxy.appKey, 'Content-Type': blob.type || 'audio/webm' }
+      : { 'Authorization': 'Token ' + this.apiKey, 'Content-Type': blob.type || 'audio/webm' };
+
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeoutMs);
     try {
-      const res = await fetch('https://api.deepgram.com/v1/listen?' + params.toString(), {
+      const res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Authorization': 'Token ' + this.apiKey,
-          'Content-Type': blob.type || 'audio/webm',
-        },
+        headers,
         body: blob,
         signal: ctrl.signal,
       });

@@ -28,6 +28,30 @@
     initDebug();
     initFtue();
     initHotkeys();
+    initAds();
+  }
+
+  // ---- ADS (Overwolf requires ads or subscriptions for store approval) ----
+  function initAds() {
+    if (typeof OwAd === 'undefined') return; // SDK unavailable (dev/offline) — section stays hidden
+    let ad = null;
+    try {
+      ad = new OwAd($('ad-box'), { size: { width: 400, height: 300 } });
+    } catch (err) {
+      console.error('[desktop] OwAd init failed', err);
+      return;
+    }
+    ad.addEventListener('ow_internal_rendered', () => { $('ad-section').style.display = ''; });
+    // Guideline: never serve ads while the window isn't visible.
+    overwolf.windows.getCurrentWindow((res) => {
+      const myId = res && res.window && res.window.id;
+      overwolf.windows.onStateChanged.addListener((state) => {
+        if (!myId || state.window_id !== myId) return;
+        const s = state.window_state_ex;
+        if (s === 'minimized' || s === 'hidden' || s === 'closed') ad.removeAd();
+        else if (s === 'normal' || s === 'maximized') ad.refreshAd();
+      });
+    });
   }
 
   // ---- FTUE (first launch only) ----

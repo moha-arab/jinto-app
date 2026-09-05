@@ -99,6 +99,13 @@ class BackgroundController {
   }
 
   _validateKeys() {
+    const proxy = window.JINTO_PROXY || {};
+    if (proxy.enabled) {
+      console.log('[jinto/bg] proxy mode — services via ' + proxy.base);
+      this.claude = new ClaudeService(null);
+      this.tts = new CartesiaService(null);
+      return;
+    }
     const keys = window.JINTO_KEYS || {};
     const missing = [];
     if (!keys.DEEPGRAM) missing.push('DEEPGRAM');
@@ -214,7 +221,7 @@ class BackgroundController {
       this._chunks = [];
       if (chunks.length) {
         const blob = new Blob(chunks, { type: chunks[0].type || 'audio/webm' });
-        finalText = await new DeepgramService(window.JINTO_KEYS.DEEPGRAM).transcribe(blob);
+        finalText = await new DeepgramService((window.JINTO_KEYS || {}).DEEPGRAM).transcribe(blob);
       }
     } catch (err) {
       console.error('[jinto/bg] transcription failed:', err);

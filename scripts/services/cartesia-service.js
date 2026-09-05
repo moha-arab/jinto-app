@@ -31,7 +31,17 @@ class CartesiaService {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) return;
     if (this.ws) this.close();
 
-    const url = `wss://api.cartesia.ai/tts/websocket?cartesia_version=${CARTESIA_VERSION}&access_token=${encodeURIComponent(this.apiKey)}`;
+    // Proxy mode: the WebSocket stays direct (latency), but authenticates with a
+    // short-lived token minted by jinto.gg instead of a real key.
+    let credential = this.apiKey;
+    const proxy = (typeof window !== 'undefined' && window.JINTO_PROXY) || {};
+    if (proxy.enabled) {
+      const r = await fetch(proxy.base + '/tts-token', { method: 'POST', headers: { 'x-jinto-key': proxy.appKey } });
+      if (!r.ok) throw new Error('tts token mint failed: HTTP ' + r.status);
+      credential = (await r.json()).token;
+    }
+
+    const url = `wss://api.cartesia.ai/tts/websocket?cartesia_version=${CARTESIA_VERSION}&access_token=${encodeURIComponent(credential)}`;
 
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(url);
