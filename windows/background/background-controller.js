@@ -359,7 +359,7 @@ class BackgroundController {
           this._ttsCloseTimer = setTimeout(() => {
             this._ttsCloseTimer = null;
             if (this.tts && turnId === this._ttsTurn) this.tts.close();
-          }, 8000);
+          }, 60000); // long grace: questions inside a match reuse the warm socket
         }
       } else if (full && full.trim()) {
         // OpenAI / WebSpeech path: send full text after Claude completes
@@ -479,7 +479,8 @@ class BackgroundController {
     try {
       if (this.tts) {
         this.tts.cancel();
-        this.tts.close();
+        // Keep the socket: barge-in means a new question is coming RIGHT NOW — the warm
+        // connection is exactly what makes that next answer fast.
       }
     } catch (_) {}
     try { if (this.player) this.player.stopAll(); } catch (_) {}

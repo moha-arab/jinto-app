@@ -26,6 +26,9 @@ class CartesiaService {
   }
 
   async connect() {
+    // Reuse a healthy socket: the WSS handshake costs a few hundred ms per turn, and Cartesia
+    // supports many contexts per connection. A dead/half-open socket is replaced below.
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) return;
     if (this.ws) this.close();
 
     const url = `wss://api.cartesia.ai/tts/websocket?cartesia_version=${CARTESIA_VERSION}&access_token=${encodeURIComponent(this.apiKey)}`;
@@ -46,11 +49,16 @@ class CartesiaService {
 
       this.ws.onclose = (e) => {
         console.log('[cartesia] closed', e.code, e.reason);
+        this.ws = null; // never let connect() reuse a closed socket
       };
 
       this.ws.onmessage = (e) => {
         try {
           const data = JSON.parse(e.data);
+          // With socket reuse, a late message from a finished/cancelled context must not
+          // leak into the current turn's audio.
+          if (data.context_id && this.contextId && data.context_id !== this.contextId) return;
+          if (data.type === 'chunk' && !this.contextId) return; // cancelled turn: eat late audio
           if (data.type === 'chunk' && data.data) {
             if (this.onAudioChunk) this.onAudioChunk(data.data);
           } else if (data.type === 'done' || data.done === true) {
