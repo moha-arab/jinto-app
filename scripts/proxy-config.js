@@ -5,7 +5,7 @@
 // The appKey only gates casual abuse of the proxy — it ships inside the app and
 // is not a secret in the cryptographic sense.
 window.JINTO_PROXY = {
-  enabled: false, // flip once Vercel env vars are set and endpoints verified
+  enabled: true, // verified live Sept 5, 2026 — all three endpoints tested through jinto.gg
   base: 'https://jinto.gg/api',
   appKey: 'REDACTED',
 };
