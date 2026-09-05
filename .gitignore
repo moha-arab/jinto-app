@@ -31,3 +31,4 @@ releases/
 img/overlay/_capture/
 battery-report.md
 battery-report-partial.md
+dist/
