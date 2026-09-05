@@ -36,7 +36,7 @@ Don't teleport as a rotation shortcut. The leash barely moves you anyway, and th
 
 Ulted, play it like the Operator you didn't buy: long sightline, off-angle, first contact, one shot, then move.
 
-Retakes are your worst phase; the kit buys almost nothing once the site is theirs. Swing with your team, trade like a rifle body, and don't be precious about it.
+Retakes are your worst phase; you have no flash or stun to clear a site, so it comes down to gunfights. Swing with your team, trade like a rifle body, and don't be precious about it. The one card you do own is the ult: an opening pick plus its slow field is the best retake tool you carry, so a banked Tour de Force gets spent here.
 
 ## Decisions that win or lose rounds
 
