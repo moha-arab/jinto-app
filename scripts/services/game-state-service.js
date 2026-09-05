@@ -157,10 +157,45 @@ class GameStateService {
 
     if (info.game_info) {
       if (info.game_info.state) this.state.gameState = info.game_info.state;
+      // scene carries the map name in-game ("Ascent") — use it as a map fallback for
+      // mid-match launches where match_info.map never arrived.
+      if (typeof info.game_info.scene === 'string' && !this.state.map) {
+        const sceneMap = this._cleanMapName(info.game_info.scene);
+        if (sceneMap && !/menu|range|lobby|select/i.test(sceneMap)) {
+          this.state.map = sceneMap;
+          changed = true;
+          console.log('[gep] map (from scene) =', sceneMap);
+        }
+      }
     }
+
+    // Mid-match launch recovery: map/round known but no agent -> GEP never pushed "me".
+    // Re-pull the full snapshot until the agent shows up (seen live: dashboard said
+    // "agent select on Ascent" during a real match).
+    if (!this.state.agent && (this.state.map || this.state.roundPhase)) this._startAgentRecovery();
+    else if (this.state.agent) this._stopAgentRecovery();
 
     if (changed) {
       this.eventBus.trigger('game-state', { ...this.state });
+    }
+  }
+
+  _startAgentRecovery() {
+    if (this._agentRecoveryTimer) return;
+    let tries = 0;
+    console.log('[gep] agent unknown with a map in view — polling getInfo until it appears');
+    this._agentRecoveryTimer = setInterval(() => {
+      if (this.state.agent || ++tries > 20) { this._stopAgentRecovery(); return; }
+      overwolf.games.events.getInfo((res) => {
+        if (res && res.success && res.res) this._handleInfoUpdate({ info: res.res });
+      });
+    }, 15000);
+  }
+
+  _stopAgentRecovery() {
+    if (this._agentRecoveryTimer) {
+      clearInterval(this._agentRecoveryTimer);
+      this._agentRecoveryTimer = null;
     }
   }
 

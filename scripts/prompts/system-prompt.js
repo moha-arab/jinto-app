@@ -31,7 +31,13 @@ function buildSystemPromptParts(gameState) {
     stateBlock = `The player is playing ${agent} on ${map}. Side: ${side}. Round: ${round}. Phase: ${phase}.
 Side matters: attack and defense are different jobs — coach the side they are on unless they ask about the other.`;
   } else if (map && !agent) {
-    stateBlock = `The player is in agent select on ${map} — no agent locked yet. They may ask what you support here, or how you'd play a specific agent; both are fair game.`;
+    // Round data proves a live match — a mid-match launch can leave the agent undetected,
+    // and claiming "agent select" then makes jinto coach a wrong assumption.
+    if (gs.roundPhase || gs.roundNumber != null) {
+      stateBlock = `The player is MID-MATCH on ${map} (round ${round}, ${phase}) but their agent hasn't been detected. Don't guess it. For agent-specific questions, give one line of real coaching if the question allows, then ask which agent they're on. Any supported agent they name: coach it.`;
+    } else {
+      stateBlock = `The player is in agent select on ${map} — no agent locked yet. They may ask what you support here, or how you'd play a specific agent; both are fair game.`;
+    }
   } else if (agent && !map) {
     stateBlock = `The player is on ${agent}; the map isn't visible yet.`;
   } else {

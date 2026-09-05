@@ -26,6 +26,41 @@
     initVoice();
     initConversation();
     initDebug();
+    initFtue();
+    initHotkeys();
+  }
+
+  // ---- FTUE (first launch only) ----
+  function initFtue() {
+    let seen = null;
+    try { seen = localStorage.getItem('jinto-ftue-done'); } catch (_) {}
+    if (!seen) $('ftue').style.display = '';
+    $('ftue-done').addEventListener('click', () => {
+      try { localStorage.setItem('jinto-ftue-done', '1'); } catch (_) {}
+      $('ftue').style.display = 'none';
+    });
+  }
+
+  // ---- HOTKEYS ----
+  function renderHotkeys() {
+    try {
+      overwolf.settings.hotkeys.get((res) => {
+        if (!res || !res.success) return;
+        const all = [].concat(res.globals || [], (res.games && res.games['21640']) || []);
+        const find = (name) => { const h = all.find((x) => x.name === name); return h && h.binding; };
+        const ptt = find('jinto_ptt'); const dash = find('jinto_toggle_settings');
+        if (ptt) $('hk-ptt').textContent = ptt === 'Oemtilde' ? '` (hold)' : ptt + ' (hold)';
+        if (dash) $('hk-dash').textContent = dash;
+      });
+    } catch (_) {}
+  }
+
+  function initHotkeys() {
+    renderHotkeys();
+    try { overwolf.settings.hotkeys.onChanged.addListener(renderHotkeys); } catch (_) {}
+    $('hk-change').addEventListener('click', () => {
+      location.href = 'overwolf://settings/games-overlay?hotkey=jinto_ptt&gameId=21640';
+    });
   }
 
   // ---- JINTO SEES ----
@@ -41,8 +76,13 @@
         gs.roundPhase || '',
       ].filter(Boolean).join(' · ');
     } else if (gs.map && !gs.agent) {
-      el.textContent = 'agent select on ' + gs.map;
-      $('det-sub').textContent = 'lock an agent and jinto follows';
+      if (gs.roundPhase || gs.roundNumber != null) {
+        el.textContent = 'in a match on ' + gs.map + ' — agent not detected';
+        $('det-sub').textContent = "jinto will ask which agent you're on · PULL FRESH GAME STATE in debug can fix this";
+      } else {
+        el.textContent = 'agent select on ' + gs.map;
+        $('det-sub').textContent = 'lock an agent and jinto follows';
+      }
     } else {
       el.innerHTML = '<span class="dim">no game detected</span>';
       $('det-sub').textContent = 'jinto still answers questions about the agents it knows';
