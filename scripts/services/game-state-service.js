@@ -4,7 +4,11 @@
 
 // Overwolf's Valorant team feature has been degraded/wrong (July 2026). While false, the
 // player's side stays "unknown" and observed raw values are logged for later verification.
-const TRUST_TEAM_FEED = false;
+// Sept 5, 2026: Overwolf's whole Valorant feed reads green (team key included), so the side
+// feed is ON for live verification per Mohammad. July 2026 history for the record: he observed
+// "it says attack when I'm on defense" while the feed was officially degraded — that's why
+// this was off. If a wrong side shows up again, flip this back to false.
+const TRUST_TEAM_FEED = true;
 
 class GameStateService {
   constructor(eventBus) {
@@ -151,7 +155,11 @@ class GameStateService {
         // Flip TRUST_TEAM_FEED at the top of this file once verified.
         if (TRUST_TEAM_FEED) {
           const side = this._cleanSide(info.match_info.team);
-          if (side !== this.state.side) this.state.side = side;
+          if (side !== this.state.side) {
+            this.state.side = side;
+            changed = true;
+            console.log('[gep] side =', side, '(raw:', JSON.stringify(info.match_info.team) + ') at round', this.state.roundNumber);
+          }
         } else {
           if (this._lastLoggedTeam !== info.match_info.team) {
             console.log('[gep] team value observed (untrusted, not used):', JSON.stringify(info.match_info.team), 'at round', this.state.roundNumber);
