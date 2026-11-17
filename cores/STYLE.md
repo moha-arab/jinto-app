@@ -1,14 +1,14 @@
 # Core doc writing guide
 
 *Every core doc is written and revised against this guide. It exists so all cores sound like the
-same coach. Sources of these rules: the PRD voice spec + Mohammad's red-pen of the first drafts
+same coach. These rules come from the product's voice spec plus review notes on the first drafts
 (July 2026). If a rule here changes, change it here first.*
 
 ## Who reads a core
 
-Two readers: **the AI** (reasons from it live, mid-game) and **Mohammad** (verifies it).
-Dense is fine — the AI unpacks dense prose easily. **Ambiguous is never fine** — if Mohammad
-can't follow a sentence, he can't verify it, and the AI may mis-read it too.
+Two readers: **the model** (reasons from it live, mid-game) and **the reviewer** (checks it for accuracy).
+Dense is fine; the model unpacks dense prose easily. **Ambiguous is never fine.** If a human reviewer
+can't follow a sentence, they can't verify it, and the model may mis-read it too.
 
 ## The master rule
 
@@ -39,7 +39,7 @@ heard") — citing the patch that changed it is not.
   Clove's ~6-second death smoke: keep (it sizes what the smoke can cover — half a defuse).
   A windup change from 0.9s to 0.7s: cut — translate to the decision ("once a wire trips,
   assume you're revealed") or delete. Nobody asks the coach for patch-note deltas.
-- **No [VERIFY] tags in shipped docs.** Research resolves them before Mohammad reads. If a fact
+- **No [VERIFY] tags in shipped docs.** Research resolves them before review. If a fact
   genuinely can't be confirmed, REWRITE the advice so it doesn't depend on that fact.
 - **Volatile claims get made durable or cut.** "Tops the winrate charts as of patch X" is
   homework (see the master rule); state the durable reason behind the claim instead. The header
@@ -50,10 +50,10 @@ heard") — citing the patch that changed it is not.
   can be true at research time and wrong by the reader's first game. Mechanics, geometry, and
   decision logic age in years; write those.
 - **Sourcing:** facts come from real, current sources — guides, videos, Reddit mains, and
-  Mohammad's own game knowledge (he is a valid source). Never from the AI's own memory.
+  and the reviewer's own game knowledge. Never from the model's own memory.
 - Patch line at the top of every doc: *(written against patch X.XX, month year)*.
 
-## Clarity rules (from the first red-pen)
+## Clarity rules (from the first review pass)
 
 - **Analogies must explain themselves.** "A Phoenix ult" means nothing to someone who doesn't
   play Phoenix. Either unpack it in the same sentence or drop it.
@@ -66,7 +66,7 @@ heard") — citing the patch that changed it is not.
   even when it's technically correct ("rechambering" → "reloading"). Write what people say in comms.
 - **No meta-tier claims about other agents.** "Pros play X and Y now" rots faster than any other
   fact type and coaches nothing (proof: a draft called Yoru/Neon the top duelists; weeks later
-  Mohammad: "both are awful now"). The only meta claim allowed is the durable WHY about this
+  review: "both are awful now"). The only meta claim allowed is the durable WHY about this
   agent ("ranked defenders punish dashes worse than pros do").
 - **Cross-agent comparisons must earn their place.** Keep one only if it changes the player's
   decision or frames their identity ("Omen converts through teammates; you convert through

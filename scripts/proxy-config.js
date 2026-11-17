@@ -1,11 +1,18 @@
-// proxy-config.js — how the app reaches its AI services.
-// enabled=false: dev mode, direct API calls with keys from secrets.local.js.
-// enabled=true: everything goes through jinto.gg/api (keys live in Vercel env
-// vars; Cartesia gets a short-lived minted token so its WebSocket stays direct).
-// The appKey only gates casual abuse of the proxy — it ships inside the app and
-// is not a secret in the cryptographic sense.
+// How the app reaches its AI services.
+//
+//   enabled: false   Development. Calls Deepgram, Anthropic and Cartesia directly
+//                    using keys from secrets.local.js (gitignored).
+//   enabled: true    Proxied. Speech-to-text and the language model go through
+//                    jinto.gg/api, where the provider keys live in server
+//                    environment variables and never reach the client. Speech
+//                    synthesis still connects directly, authenticated with a
+//                    short-lived token minted by /api/tts-token.
+//
+// appKey identifies this client to the proxy. It is not a provider credential,
+// but it is still read from secrets.local.js so it stays out of version control.
+// See secrets.example.js for the expected shape.
 window.JINTO_PROXY = {
-  enabled: true, // verified live Sept 5, 2026 — all three endpoints tested through jinto.gg
+  enabled: true,
   base: 'https://jinto.gg/api',
-  appKey: 'REDACTED',
+  appKey: (window.JINTO_KEYS && window.JINTO_KEYS.APP_KEY) || '',
 };

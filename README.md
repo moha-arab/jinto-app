@@ -1,162 +1,224 @@
 # jinto
 
-A real-time voice AI coach for VALORANT. You hold a key mid-match, ask a question out loud
-("how do I set up my site as Killjoy?"), and hear a spoken answer in ~2 seconds without leaving
-the game. It runs as an [Overwolf](https://dev.overwolf.com) native app on top of the running
-game and coaches 11 agents from a hand-authored, human-reviewed knowledge base.
+A voice coach that runs on top of a live VALORANT match. Hold a key, ask a question out loud,
+and hear a spoken answer about two seconds later without ever leaving the game.
 
-This README is an engineering overview: the architecture, the problems that were actually hard,
-and how they were solved.
+> **Status:** feature complete and tested in real matches, not publicly released. Distribution is
+> gated on Riot Games third-party approval (application submitted June 2026, still queued) and
+> then an Overwolf store review. The site and backend are live at [jinto.gg](https://jinto.gg).
+
+![The overlay answering a question mid-round](docs/overlay-coaching.jpg)
+
+The app knows which agent, map, side and round you are in, so you never tell it anything. It
+coaches 11 agents from a knowledge base written and reviewed by hand, and it is built to say "I
+don't have that" rather than invent an answer.
+
+It also refuses to play the game for you. Asked where enemies are or whether to push, it declines
+by design, which is both a coaching decision and a Riot third-party policy requirement.
+
+![Refusing a live tactical question](docs/overlay-refusal.jpg)
 
 ---
 
-## The pipeline
+## How a question flows
 
-One question is a four-stage streaming pipeline, tuned so the player hears the first words fast
-rather than waiting for the whole answer:
+Four stages, streamed so the first words arrive before the answer is finished generating.
 
 ```
-push-to-talk (hold `) ──► mic capture (MediaRecorder, Opus/WebM)
-      │  release
-      ▼
-  batch STT ──────────► Deepgram Nova-3 (prerecorded endpoint, keyterm-boosted)
-      │  transcript
-      ▼
-  streaming LLM ──────► Claude Sonnet (SSE, one tool: log_miss)
-      │  tokens, at sentence boundaries
-      ▼
-  streaming TTS ──────► Cartesia Sonic-3 (WebSocket, PCM chunks)
-      │
-      ▼
-  Web Audio playback (gap-free scheduling) + on-screen text card
+hold `  ──►  microphone capture (MediaRecorder, Opus/WebM)
+   │ release
+   ▼
+speech to text  ──►  Deepgram Nova-3, batch, keyterm boosted
+   │ transcript
+   ▼
+language model  ──►  Claude Sonnet over SSE, one tool call (log_miss)
+   │ tokens, flushed at sentence boundaries
+   ▼
+speech synthesis ──►  Cartesia Sonic-3 over WebSocket, PCM chunks
+   │
+   ▼
+Web Audio playback, gap-free scheduling, plus the on-screen card
 ```
 
-**Why batch STT, not streaming.** An earlier build streamed partial transcripts and mis-heard
-short commands badly ("yo" → "nope"). Switching to a full-utterance batch transcribe on
-key-release traded a little latency for a large accuracy gain, and the utterance is short enough
-(a spoken question) that the batch call is still sub-second.
+**Batch speech to text, not streaming.** An earlier build streamed partial transcripts and
+misheard short commands badly ("yo" became "nope"). A wrong transcript produces a confidently
+wrong coaching answer, which is worse than being slightly slower, so the whole utterance is
+transcribed on key release instead. It costs little: that stage measures 294 ms, while the
+dominant cost is the model's first token at roughly 1.2 s.
 
-**Sentence-boundary TTS.** Claude's tokens are buffered and flushed to Cartesia only at sentence
-boundaries. Flushing on commas/clauses made the synthesized voice sound stitched together;
-whole sentences keep prosody natural while still starting playback before the full answer exists.
-
-**Latency, measured end to end.** Every turn is instrumented with marks from PTT-release to first
-audio: mic flush, STT, first LLM token, first audio. Current p50 is ~2s voice-to-voice. The
-breakdown is surfaced live in an in-app debug panel, so optimization was driven by data, not
-guesses — the dominant remaining cost is the model's first-token time, not anything in our code.
+**Sentence-boundary synthesis.** Model tokens are buffered and flushed to the synthesiser only at
+sentence boundaries. Flushing on commas made the voice sound stitched together, while whole
+sentences keep the prosody natural and still start playback before generation finishes.
 
 ---
 
-## Latency engineering
+## Engineering notes
 
-Two targeted cuts, both from reading the instrumentation:
+### Latency was measured, not guessed
 
-- **Prompt caching.** The system prompt is ~30k tokens (persona + 11 agent knowledge docs +
-  behavioral rules). It was being reprocessed on every question. Splitting it into a *stable*
-  block (cache breakpoint) and a small *volatile* game-state tail means the 30k-token prefix is
-  written to cache once and read back on every subsequent turn — verified live: 29,885 tokens
-  written on the first call, read on all others. ~10× cheaper on input and noticeably faster,
-  and the split is designed so round/side changes never bust the cache; only switching agents
-  does.
-- **Warm TTS socket.** Cartesia's WebSocket handshake costs a few hundred ms. The connection is
-  now reused across turns (it supports many contexts per socket) with a long idle grace, and
-  stale/cancelled-context audio is filtered so reuse can't leak old audio into a new answer.
+Every turn records timing marks from key release through microphone flush, transcription, first
+model token and first audio. The breakdown is surfaced in an in-app diagnostics panel, so the
+optimisation work below came from reading real numbers.
 
----
-
-## The knowledge system, and preventing hallucination
-
-Coaching quality is the product, so the knowledge model is deliberate.
-
-**Authored cores, not the model's memory.** Each agent has a `cores/<agent>.md` "core" — a dense,
-map-agnostic coaching doc written from current guides and reviewed by a human, against a written
-[style guide](cores/STYLE.md). A build step (`cores/build.js`) compiles the Markdown into
-self-registering JS modules the app injects into the prompt. The model *reasons over* these docs;
-it is explicitly forbidden from inventing specifics (map spots, lineups, numbers) from its own
-memory, which rot and are exactly where an LLM confidently lies.
-
-**Structural cross-agent isolation.** The hardest correctness bug: asked about Jett, the model
-would borrow Cypher's abilities ("throw a cage"). Prompt rules alone didn't hold. The fix is
-structural — the current agent's core is injected as the `ACTIVE CORE`, every other agent's core
-is walled behind an explicit `LOCKED` barrier that only unlocks when the player names that agent,
-and an ability-ownership table states which vocabulary belongs to which kit. Cross-agent bleed
-went to zero and is guarded by a regression test.
-
-**Balanced refusal.** The prompt is tuned against two failure modes at once: never fabricate, but
-never over-refuse a question that's *derivable* ("should Jett carry the spike?" → reason from her
-kit + universal game rules, don't punt). It also refuses live tactical calls by design ("should I
-push mid?" → "that's your read, I teach the agent, I don't call the round") — both a coaching
-choice and a Riot third-party-policy requirement.
-
----
-
-## Evaluation harness
-
-`cores/battery.js` is an automated behavioral eval that assembles the **exact** production prompt,
-model, and tools, then grills the system with 55 scripted questions across game states: kit
-mechanics, slop-bait ("any tips?" must stay specific-or-honest), refusal balance, cross-agent
-regression traps, map-specific gaps, and the agent-select / no-game states. It writes a graded
-report. Every prompt or knowledge change is re-run through it before shipping — the eval is the
-gate that caught the cross-agent bleed and the over-refusal regressions.
-
----
-
-## Secrets: the serverless proxy
-
-The app talks to three paid APIs (Deepgram, Anthropic, Cartesia). Shipping their keys inside a
-distributed desktop app is a non-starter, so the app runs in **proxy mode** against a set of
-Vercel Edge Functions ([`jinto.gg/api`](https://jinto.gg)):
-
-- `/api/llm` — streams Anthropic SSE straight through, with the model and a max-token ceiling
-  enforced *server-side* so a leaked app key can't run up cost.
-- `/api/stt` — Deepgram batch passthrough with fixed params.
-- `/api/tts-token` — mints a short-lived (10-min) Cartesia token so the low-latency TTS
-  WebSocket stays **direct from the client** while the real key never leaves the server.
-
-Keys live only in server env vars. The client authenticates with a non-secret app key; a single
-config flag (`scripts/proxy-config.js`) switches between direct-dev and proxied-prod.
-
----
-
-## Game integration
-
-Agent, map, side, round, and phase come from Overwolf's Game Events Provider (GEP), the
-publisher-sanctioned event feed — no Riot API, no memory reading, no data about other players.
-
-**The agent-lock timing bug.** VALORANT announces your agent to GEP *once*, at lock. If the app
-isn't actively catching events at that instant (e.g. it was backgrounded while the player loaded
-in), it never sees a second announcement and sits blank. The fix: on any signal that a match has
-begun (registration, first map/round, `match_start`) with no agent known, the app polls a fresh
-`getInfo()` snapshot immediately and every 2.5s until the agent appears, then stops. Detection
-also degrades honestly — when the map is known but the agent isn't, the app says exactly that and
-asks, rather than guessing "agent select."
-
----
-
-## Architecture
-
-Overwolf native app, plain JS with ordered script tags (no build system for the app itself).
-Three windows:
-
-- **background** — headless; owns the services and an in-process event bus. Runs the pipeline.
-- **overlay** — transparent, click-through, in-game only. The text card + a mic-reactive voice
-  wave (driven by live RMS off the capture stream, which doubles as a mic diagnostic).
-- **desktop** — the dashboard (Alt+F in-game or on desktop): live detection, supported agents,
-  last exchange, a "miss log" of questions it couldn't answer, voice settings, and the latency
-  debug panel.
-
-| Layer | Tech |
+| Stage | Measured |
 |---|---|
-| App shell | Overwolf Native WebApp (vanilla JS) |
-| STT | Deepgram Nova-3 (batch, keyterm boosting) |
-| LLM | Claude Sonnet (streaming SSE, tool use) |
-| TTS | Cartesia Sonic-3 (WebSocket, PCM streaming) |
-| Audio | Web Audio API (gap-free chunk scheduling) |
-| Backend | Vercel Edge Functions (key proxy + token minting) |
-| Game data | Overwolf GEP (VALORANT) |
-| Eval | Custom battery harness (prod-identical prompt/model/tools) |
+| Speech to text | 294 ms |
+| First model token | 1,222 ms |
+| Full model stream | 1,350 ms |
+| **Key release to first audio** | **1,823 ms** |
+
+Two changes came out of that data:
+
+**Prompt caching.** The system prompt carries all 11 knowledge documents and runs to 29,885
+tokens. It was being reprocessed on every single question. Splitting it into a stable block that
+holds the cache breakpoint and a small volatile tail holding round and side means the large
+prefix is written once and read back afterwards. The split is positioned deliberately: changing
+round or side never invalidates the cache, only switching agents does. Measured against the live
+API, a cold call took 4,359 ms and the third cached call took 2,864 ms, a 34% reduction, with the
+input tokens billed at cache-read rates instead of full price.
+
+**Warm synthesis socket.** The Cartesia WebSocket handshake costs a few hundred milliseconds per
+turn. The connection is now reused across turns, with stale and cancelled-context audio filtered
+so reuse cannot leak the previous answer's audio into the next one.
+
+### Stopping the model confusing one agent with another
+
+The worst failure mode in a coaching product is a fluent, confident, wrong answer. Asked about
+Jett, the model would reach for Cypher's abilities.
+
+Prompt instructions alone did not hold. The fix is structural rather than instructional: the
+current agent's document is injected as the `ACTIVE CORE`, every other agent's document sits
+behind an explicit `LOCKED` barrier that only opens when the player names that agent, and an
+ability-ownership table maps vocabulary to the kit that owns it. The original failure cases are
+now permanent regression questions in the eval suite so the bug cannot return quietly.
+
+### Keys cannot ship inside a desktop app
+
+The client talks to three paid APIs. Shipping an installer means shipping those keys to every
+user, so the app runs against a small serverless proxy instead
+([source in the jinto.gg repo](https://github.com/moha-arab/jinto.gg)):
+
+| Endpoint | Does |
+|---|---|
+| `/api/llm` | Streams the model response through. Model and max-token ceiling are pinned server side, so a stolen client key cannot escalate cost. |
+| `/api/stt` | Transcription passthrough with fixed server-side parameters. |
+| `/api/tts-token` | Mints a 10-minute scoped synthesis token, so the latency-critical audio socket stays client-direct while the real key never leaves the server. |
+
+No provider credential exists in the client.
+
+### A game event that fires exactly once
+
+VALORANT announces your agent to Overwolf at lock-in, once. If the app is not listening at that
+instant, for example because it was backgrounded while you loaded in, nothing ever repeats it and
+the app sits with no idea who you are playing.
+
+Recovery is bounded and aggressive: on any signal that a match has started, pull a fresh snapshot
+immediately and then every 2.5 s until the agent appears, capped at about two minutes. Detection
+also degrades honestly, so when the map is known and the agent is not, the app says exactly that
+and asks instead of guessing.
 
 ---
 
-*jinto isn't endorsed by Riot Games. Riot Games, VALORANT, and all associated properties are
-trademarks or registered trademarks of Riot Games, Inc.*
+## Evaluating a system whose output is prose
+
+Unit tests cannot tell you whether coaching advice is good, brief, in character, or correctly
+refusing. `cores/battery.js` assembles the exact production prompt, model and tool definitions,
+then runs 58 scripted questions across 12 simulated game states: ability mechanics, refusal
+balance, cross-agent regression traps, deliberately vague prompts that bait generic filler, and
+the agent-select and no-game states. It writes a graded report with an automatic length check.
+
+It runs before any prompt or knowledge change ships. It caught the cross-agent bleed described
+above, and a regression where answers grew too long after the prompt was reordered for caching.
+
+It is a regression gate rather than a scored pass/fail suite: the length budget is checked
+automatically, the quality judgement is a human reading the report.
+
+---
+
+## The knowledge base
+
+Each agent gets a `cores/<agent>.md` document, around 1,800 words, written against a
+[style guide](cores/STYLE.md) that exists so all 11 read as the same coach. 20,120 words total.
+
+The rule that shapes them: the model reasons over these documents and is forbidden from inventing
+specifics from its own memory. Map callouts, lineups and exact numbers are the things a language
+model will confidently get wrong, so anything not in the documents gets an honest "I don't have
+that yet", which is recorded to a miss log visible in the dashboard.
+
+`cores/build.js` compiles the Markdown into self-registering modules that the app loads. Edit the
+Markdown, run the build, never edit the generated files.
+
+![The in-game dashboard](docs/dashboard-ingame.jpg)
+
+---
+
+## Running it
+
+Requires [Overwolf](https://www.overwolf.com/) and VALORANT on Windows. There is no build step
+and no package manager: the app is plain JavaScript loaded through ordered script tags.
+
+```bash
+git clone https://github.com/moha-arab/jinto-app.git
+cd jinto-app
+cp secrets.example.js secrets.local.js    # then fill it in
+```
+
+In proxied mode you only need `APP_KEY`. To run fully standalone, set `enabled: false` in
+`scripts/proxy-config.js` and supply your own Deepgram, Anthropic and Cartesia keys.
+
+Then load it in Overwolf: Settings, About, Development options, Load unpacked extension, and
+select the repository folder. Hold the backtick key in a match to talk, and Alt+F opens the
+dashboard.
+
+After editing any file in `cores/`:
+
+```bash
+node cores/build.js      # regenerate the loadable modules
+node cores/battery.js    # optional, re-run the eval suite (makes paid API calls)
+node build-opk.js        # package an Overwolf .opk installer
+```
+
+---
+
+## Repository layout
+
+```
+windows/          three Overwolf windows: background, overlay, desktop dashboard
+  background/     headless, owns the services and the event bus, runs the pipeline
+  overlay/        transparent click-through in-game card, mic-reactive level meter
+  desktop/        detection, agent roster, last exchange, miss log, diagnostics
+scripts/
+  services/       12 modules: capture, playback, the three AI clients, game state, hotkeys
+  prompts/        system prompt assembly, including the active/locked core structure
+  content/        generated knowledge modules, do not edit by hand
+cores/            the knowledge base, its style guide, the build step and the eval harness
+build-opk.js      packaging, refuses to build if the app is configured unsafely
+```
+
+| Layer | Technology |
+|---|---|
+| Client | Overwolf Native WebApp, vanilla JavaScript, no dependencies |
+| Speech to text | Deepgram Nova-3 |
+| Language model | Claude Sonnet, streaming, tool use |
+| Speech synthesis | Cartesia Sonic-3 |
+| Audio | Web Audio API |
+| Backend | Vercel Edge Functions |
+| Game data | Overwolf Game Events Provider |
+
+---
+
+## Limitations
+
+- 11 of the game's 29 agents are covered. The rest get an honest refusal rather than a guess.
+- Knowledge is map-agnostic. There are no map-specific lineups or callouts yet, by design, since
+  those are exactly what a language model fabricates most convincingly.
+- The latency figures above come from the app's own instrumentation over a small number of turns,
+  not a large sample.
+- There are no unit tests. The eval harness is the safety net, and it checks behaviour rather
+  than correctness.
+
+---
+
+jinto is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or
+anyone officially involved in producing or managing Riot Games properties. Riot Games, VALORANT
+and all associated properties are trademarks or registered trademarks of Riot Games, Inc.

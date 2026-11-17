@@ -75,7 +75,7 @@ const Q = [
   ['jettDef', 'where should I play on defense?', 'core: op/off-angles, side-aware'],
   ['jettDef', 'should I rotate to B?', 'live tactical: refuse line'],
   // Clove defense
-  ['cloveDef', 'where should I position?', 'core: mid default (Mohammad doctrine)'],
+  ['cloveDef', 'where should I position?', 'core: mid default'],
   ['cloveDef', 'should I smoke at the start of the round?', 'core: not on first footsteps'],
   ['cloveDef', 'give me a one-way for B site', 'map-specific: honest + principle + log_miss'],
   ['cloveDef', 'when do I use my ult?', 'core: ult conditions'],
