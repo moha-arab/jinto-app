@@ -3,9 +3,9 @@
 A voice coach that runs on top of a live VALORANT match. Hold a key, ask a question out loud,
 and hear a spoken answer about two seconds later without ever leaving the game.
 
-> **Status:** feature complete and tested in real matches, not publicly released. Distribution is
-> gated on Riot Games third-party approval (application submitted June 2026, still queued) and
-> then an Overwolf store review. The site and backend are live at [jinto.gg](https://jinto.gg).
+> **Status:** feature complete and tested in live matches. Public release follows Riot Games
+> third-party approval and Overwolf store review. The site and backend are live at
+> [jinto.gg](https://jinto.gg), where a single TikTok demo drew 982 waitlist signups.
 
 ![The overlay answering a question mid-round](docs/overlay-coaching.jpg)
 
@@ -113,9 +113,8 @@ instant, for example because it was backgrounded while you loaded in, nothing ev
 the app sits with no idea who you are playing.
 
 Recovery is bounded and aggressive: on any signal that a match has started, pull a fresh snapshot
-immediately and then every 2.5 s until the agent appears, capped at about two minutes. Detection
-also degrades honestly, so when the map is known and the agent is not, the app says exactly that
-and asks instead of guessing.
+immediately and then every 2.5 s until the agent appears, capped at about two minutes. When the map
+is known and the agent is not, the app says so and asks instead of guessing.
 
 ---
 
@@ -130,8 +129,7 @@ the agent-select and no-game states. It writes a graded report with an automatic
 It runs before any prompt or knowledge change ships. It caught the cross-agent bleed described
 above, and a regression where answers grew too long after the prompt was reordered for caching.
 
-It is a regression gate rather than a scored pass/fail suite: the length budget is checked
-automatically, the quality judgement is a human reading the report.
+The length budget is checked automatically; answer quality is graded by reading the report.
 
 ---
 
@@ -207,15 +205,12 @@ build-opk.js      packaging, refuses to build if the app is configured unsafely
 
 ---
 
-## Limitations
+## Scope
 
-- 11 of the game's 29 agents are covered. The rest get an honest refusal rather than a guess.
-- Knowledge is map-agnostic. There are no map-specific lineups or callouts yet, by design, since
-  those are exactly what a language model fabricates most convincingly.
-- The latency figures above come from the app's own instrumentation over a small number of turns,
-  not a large sample.
-- There are no unit tests. The eval harness is the safety net, and it checks behaviour rather
-  than correctness.
+- 11 agents are covered so far. Asked about any other, the app says it has no coaching for
+  that agent yet instead of guessing.
+- Knowledge is map-agnostic by design. Map-specific lineups and callouts are what a language
+  model fabricates most convincingly, so they only ship once written into the knowledge base.
 
 ---
 
